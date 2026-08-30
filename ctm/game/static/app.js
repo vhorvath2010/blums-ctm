@@ -90,7 +90,7 @@ function withTerms(str) {
     if (taken.includes(term.toLowerCase())) return;
     taken.push(term.toLowerCase());
     out = out.slice(0, m.index) +
-      `<button class="term" data-term="${term}">${m[1]}</button>` +
+      `<span class="term" tabindex="0" data-term="${term}">${m[1]}</span>` +
       out.slice(m.index + m[1].length);
   });
   return out;
@@ -102,15 +102,13 @@ function attachTerms(root) {
     b.onfocus = () => showTip(b);
     b.onmouseleave = hideTip;
     b.onblur = hideTip;
-    b.onclick = () => { hideTip(); showIndex(b.dataset.term); };
   });
 }
 
 function showTip(anchor) {
   const tip = $("tip");
   const term = anchor.dataset.term;
-  tip.innerHTML = `<b>${escapeHtml(term)}</b>${escapeHtml(GLOSSARY[term])}` +
-                  `<i>click for the full index</i>`;
+  tip.innerHTML = `<b>${escapeHtml(term)}</b>${escapeHtml(GLOSSARY[term])}`;
   tip.hidden = false;
   const a = anchor.getBoundingClientRect();
   const t = tip.getBoundingClientRect();
@@ -122,61 +120,6 @@ function showTip(anchor) {
 }
 
 const hideTip = () => { $("tip").hidden = true; };
-
-/* ------------------------------------------------------------- index */
-
-/* Reading order, not alphabetical: the machine's parts first, then what it
-   does with them, then the two conditions the levels reproduce. */
-const INDEX_ORDER = [
-  "Conscious Turing Machine", "processor", "chunk", "weight", "competition",
-  "Up-Tree", "Short Term Memory", "conscious content", "broadcast", "link",
-  "tick", "blindsight", "inattentional blindness",
-];
-
-function buildIndex() {
-  const list = $("index-list");
-  list.innerHTML = "";
-  const order = INDEX_ORDER.filter((t) => t in GLOSSARY)
-    .concat(Object.keys(GLOSSARY).filter((t) => !INDEX_ORDER.includes(t)));
-  order.forEach((term) => {
-    const dt = document.createElement("dt");
-    dt.id = `term-${term.replace(/\s+/g, "-").toLowerCase()}`;
-    dt.textContent = term;
-    const dd = document.createElement("dd");
-    dd.textContent = GLOSSARY[term];
-    list.append(dt, dd);
-  });
-}
-
-let cameFrom = "screen-title";
-
-function showIndex(focusTerm) {
-  cameFrom = $("screen-play").hidden ? "screen-title" : "screen-play";
-  setPlaying(false);
-  buildIndex();
-  $("screen-title").hidden = true;
-  $("screen-play").hidden = true;
-  $("screen-index").hidden = false;
-  if (focusTerm) {
-    const el = document.getElementById(
-      `term-${focusTerm.replace(/\s+/g, "-").toLowerCase()}`);
-    if (el) {
-      el.scrollIntoView({ block: "center" });
-      el.classList.add("lit");
-      setTimeout(() => el.classList.remove("lit"), 2200);
-    }
-  }
-}
-
-function leaveIndex() {
-  $("screen-index").hidden = true;
-  if (cameFrom === "screen-play") {
-    $("screen-play").hidden = false;
-    setPlaying(state.level.autoplay && !state.solved);
-  } else {
-    showMenu();
-  }
-}
 
 /* ------------------------------------------------------------ network */
 
@@ -314,14 +257,12 @@ const showMenu = () => {
   buildMenu();
   $("screen-title").hidden = false;
   $("screen-play").hidden = true;
-  $("screen-index").hidden = true;
   $("curtain").hidden = true;
 };
 
 const showPlay = () => {
   $("screen-title").hidden = true;
   $("screen-play").hidden = false;
-  $("screen-index").hidden = true;
   $("curtain").hidden = true;
   setPlaying(state.level.autoplay);
 };
@@ -738,14 +679,7 @@ function wire() {
              { strokes: 22, chips: 7, rivets: [[0.02, 0.12], [0.98, 0.12],
                                                [0.02, 0.88], [0.98, 0.88]],
                rivetSize: 2.6 });
-  $("btn-glossary").onclick = () => showIndex();
-  $("btn-glossary-2").onclick = () => showIndex();
-  $("btn-index-back").onclick = leaveIndex;
   document.addEventListener("keydown", (e) => {
-    if (!$("screen-index").hidden) {
-      if (e.key === "Escape") leaveIndex();
-      return;
-    }
     if ($("screen-play").hidden) return;
     if (e.key === " ") { e.preventDefault(); step(1); }
     if (e.key === "Escape") showMenu();

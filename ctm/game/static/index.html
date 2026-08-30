@@ -22,7 +22,8 @@
   <nav class="menu" id="menu"></nav>
   <p class="footnote">
     Built on the Conscious Turing Machine of Lenore and Manuel Blum (PNAS, 2022).
-    <button class="link-btn" id="btn-glossary">Read the index &rarr;</button>
+    Terms you do not know are highlighted as you read. Hover one for a
+    definition.
   </p>
 </section>
 
@@ -33,7 +34,6 @@
     <span class="level-no" id="hud-no">01</span>
     <span class="level-name" id="hud-name"></span>
     <span class="spacer"></span>
-    <button class="link-btn" id="btn-glossary-2">index</button>
     <span class="tick" id="hud-tick">T 0000</span>
   </header>
 
@@ -48,19 +48,6 @@
   <div class="progress" id="progress"></div>
   <div class="controls" id="controls"></div>
   <div class="readout" id="readout-panel"><div class="readout-body" id="readout"></div></div>
-</section>
-
-<!-- ------------------------------------------------------------- index -->
-<section class="screen index-screen" id="screen-index" hidden>
-  <header class="index-head">
-    <button class="link-btn" id="btn-index-back">&larr; back</button>
-    <h2>Index</h2>
-  </header>
-  <p class="index-intro">
-    Every term this game uses, in plain words. While you play you can hover any
-    highlighted word to see the same thing without leaving the level.
-  </p>
-  <dl class="index-list" id="index-list"></dl>
 </section>
 
 <!-- ------------------------------------------------------------ solved -->

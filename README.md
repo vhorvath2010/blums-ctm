@@ -80,8 +80,9 @@ colour laid in strokes, light caught on an edge, shapes displaced through
 turbulence so no edge is quite straight.
 
 The drawing is a skin. The writing uses the paper's own vocabulary -- processor,
-chunk, weight, competition, Up-Tree, broadcast, link -- and any term you do not
-know is highlighted: hover it for a definition, click it for the index.
+chunk, weight, competition, Up-Tree, broadcast, link -- and any term you may not
+know is highlighted. Hover one for a plain-words definition without leaving the
+level.
 
 Level 4 is the one to play if you only play one: you
 have an eye that works, an obstacle in front of you, and two switches. Quieting

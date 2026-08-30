@@ -53,7 +53,7 @@ button:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
   position: absolute; inset: 0; width: 100%; height: 100%;
   z-index: 0; pointer-events: none;
 }
-.menu-item, .big, .hud, .readout, .guess button, .switch .box, .index-head {
+.menu-item, .big, .hud, .readout, .guess button, .switch .box {
   position: relative; background: none; border: none;
 }
 .menu-item > :not(.paint-bg), .big > :not(.paint-bg),
@@ -259,7 +259,7 @@ button:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
 /* ------------------------------------------------- terms and the tip */
 
 .term {
-  font: inherit; color: var(--amber); cursor: help;
+  color: var(--amber); cursor: help;
   border-bottom: 1px dotted rgba(233, 169, 60, .65);
   padding: 0 .04em;
 }
@@ -280,37 +280,6 @@ button:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
   letter-spacing: .13em; font-size: .74rem; color: var(--amber);
   margin-bottom: .35rem;
 }
-.tip i {
-  display: block; margin-top: .5rem; font-size: .74rem; color: var(--faint);
-  font-style: normal; font-family: var(--stencil); letter-spacing: .1em;
-  text-transform: uppercase;
-}
-
-/* ------------------------------------------------------------ index */
-
-.index-screen { align-items: center; }
-.index-head {
-  display: flex; align-items: baseline; gap: 1.2rem;
-  width: min(44rem, 92vw); padding-bottom: .8rem; margin-bottom: 1.2rem;
-  border-bottom: 2px solid #333E42;
-}
-.index-head h2 {
-  font-family: var(--stencil); text-transform: uppercase; letter-spacing: .22em;
-  font-size: 1.1rem; color: var(--enamel);
-}
-.index-intro {
-  width: min(44rem, 92vw); margin: 0 0 2rem; color: var(--enamel-2);
-  font-size: 1rem;
-}
-.index-list { width: min(44rem, 92vw); margin: 0; }
-.index-list dt {
-  font-family: var(--stencil); text-transform: uppercase; letter-spacing: .14em;
-  font-size: .92rem; color: var(--amber); margin-top: 1.6rem;
-  padding: .2rem .4rem; margin-left: -.4rem; transition: background .3s ease;
-}
-.index-list dt.lit { background: rgba(233, 169, 60, .16); }
-.index-list dd { margin: .4rem 0 0; color: var(--enamel-2); }
-
 /* ---------------------------------------------------------- curtain */
 
 .curtain {
