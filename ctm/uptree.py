@@ -67,14 +67,22 @@ class UpTree:
         self.levels: list[list[Chunk]] = [
             [Chunk.silent() for _ in range(self.width >> s)] for s in range(self.h + 1)
         ]
+        # Which child each node picked last tick (0 = left, 1 = right).  Not part
+        # of the model -- the tree does not consult it -- but it is the only way
+        # to draw where a chunk was eliminated, which is the thing worth seeing.
+        self.choice: list[list[int]] = [
+            [0 for _ in range(self.width >> s)] for s in range(self.h + 1)
+        ]
 
-    def _compete(self, left: Chunk, right: Chunk) -> Chunk:
+    def _compete(self, left: Chunk, right: Chunk) -> tuple[Chunk, int]:
         """One node's work for one tick: pick a local winner, accumulate the sums."""
-        winner = left if coin_flip(self.f(left), self.f(right), self.rng) else right
-        return winner.merged(
+        took_left = coin_flip(self.f(left), self.f(right), self.rng)
+        winner = left if took_left else right
+        promoted = winner.merged(
             intensity=left.intensity + right.intensity,
             mood=left.mood + right.mood,
         )
+        return promoted, 0 if took_left else 1
 
     def tick(self, submissions: Sequence[Chunk | None]) -> Chunk:
         """Advance every level by one, then seed the leaves with a new round.
@@ -88,10 +96,12 @@ class UpTree:
         # Top-down so each level reads its children before they are overwritten.
         for s in range(self.h, 0, -1):
             below = self.levels[s - 1]
-            self.levels[s] = [
+            outcomes = [
                 self._compete(below[2 * i], below[2 * i + 1])
                 for i in range(len(self.levels[s]))
             ]
+            self.levels[s] = [chunk for chunk, _ in outcomes]
+            self.choice[s] = [side for _, side in outcomes]
 
         leaves = [c if c is not None else Chunk.silent() for c in submissions]
         leaves.extend(Chunk.silent() for _ in range(self.width - len(leaves)))
@@ -111,3 +121,31 @@ class UpTree:
         if total == 0:
             return [0.0] * len(chunks)
         return [v / total for v in values]
+
+    def snapshot(self) -> list[list[dict]]:
+        """Every node of the tree as plain data, for a visualiser.
+
+        Level s holds the competition that started s ticks ago, so a snapshot is
+        h + 1 different competitions caught mid-climb.  `winner_child` says which
+        way each node's coin fell, which is what makes elimination visible.
+        """
+        out = []
+        for s, level in enumerate(self.levels):
+            rows = []
+            for i, chunk in enumerate(level):
+                rows.append({
+                    "level": s,
+                    "index": i,
+                    "silent": chunk.is_silent,
+                    "address": chunk.address,
+                    "t": chunk.t,
+                    "modality": chunk.gist.modality,
+                    "content": chunk.gist.content,
+                    "weight": chunk.weight,
+                    "intensity": chunk.intensity,
+                    "mood": chunk.mood,
+                    "f": self.f(chunk),
+                    "winner_child": self.choice[s][i] if s > 0 else None,
+                })
+            out.append(rows)
+        return out

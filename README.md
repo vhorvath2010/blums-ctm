@@ -13,11 +13,14 @@ parameter.
 [paper]: https://www.pnas.org/doi/10.1073/pnas.2115934119
 
 ```
-pip install pytest        # only needed for the tests; the model itself is stdlib
-python -m ctm             # interactive shell
+python -m ctm.viz         # visual console in your browser  <-- start here
+python -m ctm             # text shell
 python -m ctm demos       # run every experiment
 python -m pytest tests    # check the implementation against the paper
 ```
+
+Only `pytest` is an outside dependency, and only for the tests. The model and the
+console are pure standard library.
 
 ## The model
 
@@ -53,9 +56,50 @@ only thing choosing what the machine thinks about next is a tree of coin flips.
 | 1.6 Predictive dynamics, Sleeping Experts | `ctm/sleeping_experts.py` |
 | Chapter 3 phenomena | `ctm/demos.py` |
 
+## Watching it think
+
+`python -m ctm.viz` starts a server on 127.0.0.1:8765 and opens a console.
+Nothing is reimplemented for the browser: every frame is a snapshot of the same
+Python machine the tests exercise, and every control is a command sent to it.
+
+The centrepiece is the Up-Tree, drawn live. Each row is a **different**
+competition caught mid-climb, because the tree is pipelined - a new one starts
+every tick and takes h ticks to reach the top. Chunks are coloured by modality so
+you can follow one up the tree by eye, and **clicking any node prints the local
+competition that node just ran**:
+
+```
+Level 3, node 0 - coin-flip neuron
+   audition   a barking dog             f=2.53     7.8%
+ > task       ...counting passes: 3     f=30.0    92.2%
+```
+
+That is inattentional blindness in one line. Nothing is broken; the gorilla is
+outbid.
+
+For blindsight the console draws the second route explicitly: an amber dashed
+path along the bottom labelled `vision -> motor · unconscious, bypasses the
+tree`. The chunk reaches the body without ever entering the competition, and the
+verdict panel puts the two facts side by side:
+
+```
+Vision reached STM        NO
+Body acted                4x
+... consciously            0
+... unconsciously          4
+
+  "I noticed no vision at all."
+```
+
+Controls worth trying: the **vision gain** slider (drag it down and watch a
+healthy percept stop reaching STM), the **link** checkboxes (a link moves traffic
+off-stage and the machine stops being aware of it), the counting task, and sleep.
+Space steps the clock, `p` plays.
+
 ## What falls out
 
-Run `python -m ctm demos`. Each experiment changes exactly one thing.
+Run `python -m ctm demos` for the same experiments headless. Each changes exactly
+one thing.
 
 **Blindsight** (§3.1) — crush the vision processor's gain so its chunks can never
 win the competition, but leave its link to motor intact. It still sees; it is
@@ -148,5 +192,8 @@ ctm/world.py             a one-room environment you can poke
 ctm/processors.py        vision, pain, motor, inner speech, model-of-world, memory
 ctm/build.py             a standard little mind
 ctm/demos.py             the experiments
-ctm/cli.py               the shell
+ctm/cli.py               the text shell
+ctm/viz/session.py       one live machine, flattened to JSON
+ctm/viz/server.py        stdlib HTTP server, binds 127.0.0.1 only
+ctm/viz/static/          the console (no build step, no framework)
 ```

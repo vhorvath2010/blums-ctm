@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conscious Turing Machine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="bar">
+  <div class="brand">
+    <h1>Conscious Turing Machine</h1>
+    <p>Blum &amp; Blum, PNAS 2022 &mdash; live model, not a recording</p>
+  </div>
+  <div class="clock">
+    <div class="metric"><span class="k">tick</span><strong id="m-t">0</strong></div>
+    <div class="metric"><span class="k">tree height h</span><strong id="m-h">4</strong></div>
+    <div class="metric"><span class="k">awareness lag</span><strong id="m-lag">5</strong></div>
+  </div>
+  <div class="transport">
+    <button id="btn-step" class="primary">Step</button>
+    <button id="btn-step5">+5</button>
+    <button id="btn-play">Play</button>
+    <button id="btn-reset" class="ghost">Reset</button>
+  </div>
+</header>
+
+<nav class="scenarios" id="scenarios" aria-label="Scenarios"></nav>
+<p class="caption" id="caption"></p>
+
+<main>
+  <!-- ------------------------------------------------ world / controls -->
+  <aside class="col">
+    <section class="panel">
+      <h2>The world</h2>
+      <p class="hint">Sensors feed designated processors directly &mdash; never STM.</p>
+      <div class="pokes" id="pokes"></div>
+      <div class="signals" id="signals"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Knobs</h2>
+
+      <label class="knob" for="gain">
+        <span class="knob-label">Vision gain <em id="gain-val">1.000</em></span>
+        <input type="range" id="gain" min="-3" max="0.301" step="0.001" value="0">
+        <span class="hint">Crushing gain does not blind the eye. It only makes
+        vision too quiet to win the competition. That is blindsight.</span>
+      </label>
+
+      <label class="toggle"><input type="checkbox" id="task">
+        <span>Counting task <em>(weight 30, crowds out STM)</em></span></label>
+      <label class="toggle"><input type="checkbox" id="sleep">
+        <span>Asleep <em>(inputs closed, memory recombines)</em></span></label>
+
+      <h3>Links</h3>
+      <p class="hint">A link moves traffic off-stage. The machine keeps doing the
+      thing and stops being aware it is doing it.</p>
+      <label class="toggle"><input type="checkbox" id="link-vm">
+        <span>vision &rarr; motor</span></label>
+      <label class="toggle"><input type="checkbox" id="link-nm">
+        <span>nociception &rarr; motor</span></label>
+    </section>
+
+    <section class="panel">
+      <h2>The body</h2>
+      <p class="hint">What the actuators actually did.</p>
+      <ul class="log" id="actions"></ul>
+    </section>
+  </aside>
+
+  <!-- ------------------------------------------------------- the tree -->
+  <section class="col center">
+    <div class="stm" id="stm">
+      <span class="stm-tag">STM &mdash; conscious content</span>
+      <div class="stm-body" id="stm-body"><span class="silent">silent</span></div>
+      <div class="gauges">
+        <div class="gauge"><span class="k">mood</span>
+          <div class="track"><i id="g-mood"></i></div><b id="v-mood">0.00</b></div>
+        <div class="gauge"><span class="k">intensity</span>
+          <div class="track"><i id="g-int"></i></div><b id="v-int">0.00</b></div>
+      </div>
+      <p class="hint">Neither is stored anywhere. Each is a sum accumulated one
+      addition per node on the way up.</p>
+    </div>
+
+    <div class="tree-wrap">
+      <div class="tree-head">
+        <h2>The Up-Tree</h2>
+        <p class="hint">Every level is a <em>different</em> competition, caught
+        mid-climb &mdash; the tree is pipelined, so a new one starts every tick.
+        Click any node to see why its coin fell the way it did.</p>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="tree-scroll">
+        <svg id="tree" viewBox="0 0 980 430" role="img"
+             aria-label="Up-Tree competition"></svg>
+      </div>
+      <div class="node-detail" id="detail">
+        <span class="hint">Click a node to inspect its local competition.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- -------------------------------------------------------- the LTM -->
+  <aside class="col">
+    <section class="panel">
+      <h2>Long Term Memory</h2>
+      <p class="hint">All 16 processors. The bar is each one's entitled share of
+      STM this tick &mdash; <code>f(chunk) / &Sigma;f</code>, the paper's theorem.</p>
+      <ul class="procs" id="procs"></ul>
+    </section>
+
+    <section class="panel verdict-panel">
+      <h2>Ask it what it saw</h2>
+      <div id="verdict"></div>
+    </section>
+  </aside>
+</main>
+
+<footer>
+  <section class="panel stream-panel">
+    <h2>Stream of consciousness</h2>
+    <p class="hint">Chunks broadcast from STM and received by every processor.
+    This, and only this, is what the machine can report.</p>
+    <ol class="stream" id="stream"></ol>
+  </section>
+  <section class="panel">
+    <h2>Inner speech</h2>
+    <p class="hint">It narrates the broadcast stream. It has no access to link
+    traffic, so an honest report can still be a false one.</p>
+    <ol class="speech" id="speech"></ol>
+  </section>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

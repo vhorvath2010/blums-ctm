@@ -64,7 +64,9 @@ class World:
             self.hand_withdrawn = True
             self.clear("nociception")   # taking your hand off the stove works
         elif action == "avoid":
-            self.clear("vision")
+            # The obstacle is still there; it is being steered around.  Leaving it
+            # in place keeps the unconscious route firing so it can be watched.
+            pass
 
     def recent(self, n: int = 10) -> list[str]:
         return [f"t={t:>4}  {msg}" for t, msg in self.log[-n:]]

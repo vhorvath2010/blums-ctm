@@ -37,6 +37,7 @@ class LTMProcessor:
         self.last_verdict: str | None = None
         self.best_missed_value = 0.0        # best thing SEA has seen lose
         self.awake = True
+        self.partners: tuple[str, ...] = ()  # who it is linked to, refreshed each tick
 
         self._queued: tuple[Gist, float] | None = None
         self._outgoing: list[tuple[str, Gist, float]] = []

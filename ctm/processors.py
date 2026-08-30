@@ -39,7 +39,9 @@ class SensoryProcessor(LTMProcessor):
         gist = Gist(self.modality, self.percept["label"], dict(self.percept))
         weight = self.base_weight * self.gain * self.percept["strength"] * self.valence
         # Whatever it saw, it also tells its linked partners -- unconsciously.
-        for target in self.link_targets:
+        # `link_targets` is a head start; `partners` is whatever the machine has
+        # actually wired up by now, including links formed since birth.
+        for target in dict.fromkeys((*self.link_targets, *self.partners)):
             self.tell(target, gist, abs(weight))
         return gist, weight
 

@@ -91,6 +91,11 @@ class ConsciousTuringMachine:
         record: dict = {"t": t, "broadcast": None, "conscious_content": None,
                         "link_traffic": [], "new_links": [], "actions": []}
 
+        # 0. Tell each processor who it is currently linked to.  Links form and
+        #    strengthen while the machine runs, so this cannot be fixed at birth.
+        for p in self.processors:
+            p.partners = tuple(self.links.partners(p.name))
+
         # 1. Down-Tree: conscious awareness of what entered STM last tick.
         if self.stm is not None:
             record["broadcast"] = self.stm
