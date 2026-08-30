@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Paper source is copyrighted; fetch it yourself (see papers/README.md)
+papers/*.pdf
+papers/*.txt
+
+# local Claude Code settings
+.claude/settings.local.json
