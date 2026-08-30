@@ -1,23 +1,25 @@
 /* The game holds no model state. Every frame is a snapshot of the Python CTM;
-   every control is a command sent to it. */
+   every control is a command sent to it.
+
+   The drawing treats the machine as valve-computing hardware: processors are
+   thermionic tubes whose filaments burn at their volume, and the single
+   conscious chunk is what gets lit in the phosphor aperture above them. */
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
 
 const PALETTE = {
-  red: "#BE3A25", blue: "#4A6FB5", yellow: "#EFC034",
-  ink: "#1B1815", green: "#5E8C61", task: "#EFC034",
-  idle: "#CFC9BD", silence: "#DAD5CA",
+  amber: "#E9A93C", amberHi: "#F7D08A",
+  red: "#9A4232", blue: "#4E8177", yellow: "#C08A2E",
+  ink: "#55697A", task: "#C08A2E", green: "#77854A",
+  idle: "#41505C", silence: "#2A3336",
 };
 const hue = (m) => PALETTE[m] || PALETTE.idle;
-// Ochre and paper-ish fills need dark text on them; the rest take paper.
-const darkText = (m) =>
-  m === "yellow" || m === "task" || m === "idle" || m === "silence";
 
 let state = null;
 let playing = null;
 
-/* --------------------------------------------------- hand-torn shapes */
+/* ------------------------------------------------- painted primitives */
 
 function mulberry32(a) {
   return function () {
@@ -28,65 +30,81 @@ function mulberry32(a) {
   };
 }
 
-/* A closed Catmull-Rom spline through jittered points: the torn-paper look,
-   generated rather than hand-drawn so every blob is a unique shape but a given
-   processor keeps the same one across frames. */
-function blobPath(seed, rx, ry = rx, wobble = 0.16, n = 9) {
-  const rnd = mulberry32(seed * 2654435761 % 2147483647);
-  const pts = [];
+/* Turbulence displacement is what stops these reading as vector art: every
+   edge picks up the roughness of a loaded brush. Two filters, so that broad
+   shapes scumble more than fine ones. */
+function defs(svg) {
+  const d = document.createElementNS(SVGNS, "defs");
+  d.innerHTML = `
+    <filter id="paint" x="-25%" y="-25%" width="150%" height="150%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="4"
+                    seed="11" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="9"
+                         xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="paint-fine" x="-25%" y="-25%" width="150%" height="150%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="3"
+                    seed="4" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.4"
+                         xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="bloom" x="-70%" y="-70%" width="240%" height="240%">
+      <feGaussianBlur stdDeviation="9" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="phosphor">
+      <stop offset="0%" stop-color="#4A3410"/>
+      <stop offset="70%" stop-color="#241B0C"/>
+      <stop offset="100%" stop-color="#15120A"/>
+    </radialGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5C6E72" stop-opacity=".5"/>
+      <stop offset="55%" stop-color="#2A3538" stop-opacity=".35"/>
+      <stop offset="100%" stop-color="#1A2224" stop-opacity=".6"/>
+    </linearGradient>`;
+  svg.appendChild(d);
+}
+
+const el = (svg, tag, attrs, cls) => {
+  const n = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (cls) n.setAttribute("class", cls);
+  svg.appendChild(n);
+  return n;
+};
+
+/* A smear of paint: an irregular closed spline, roughened by the filter. */
+function smearPath(seed, rx, ry, wobble = 0.22, n = 11) {
+  const rnd = mulberry32((seed * 2654435761) % 2147483647);
+  const p = [];
   for (let i = 0; i < n; i++) {
-    const a = (i / n) * Math.PI * 2 + rnd() * 0.12;
+    const a = (i / n) * Math.PI * 2 + rnd() * 0.2;
     const k = 1 - wobble + rnd() * wobble * 2;
-    pts.push([Math.cos(a) * rx * k, Math.sin(a) * ry * k]);
+    p.push([Math.cos(a) * rx * k, Math.sin(a) * ry * k]);
   }
-  let d = `M ${pts[0][0].toFixed(2)} ${pts[0][1].toFixed(2)}`;
+  let d = `M ${p[0][0].toFixed(1)} ${p[0][1].toFixed(1)}`;
   for (let i = 0; i < n; i++) {
-    const p0 = pts[(i - 1 + n) % n], p1 = pts[i];
-    const p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
-    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
-    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
-    d += ` C ${c1[0].toFixed(2)} ${c1[1].toFixed(2)}, ${c2[0].toFixed(2)} ` +
-         `${c2[1].toFixed(2)}, ${p2[0].toFixed(2)} ${p2[1].toFixed(2)}`;
+    const a = p[(i - 1 + n) % n], b = p[i], c = p[(i + 1) % n], e = p[(i + 2) % n];
+    const c1 = [b[0] + (c[0] - a[0]) / 6, b[1] + (c[1] - a[1]) / 6];
+    const c2 = [c[0] - (e[0] - b[0]) / 6, c[1] - (e[1] - b[1]) / 6];
+    d += ` C ${c1[0].toFixed(1)} ${c1[1].toFixed(1)}, ${c2[0].toFixed(1)} ` +
+         `${c2[1].toFixed(1)}, ${c[0].toFixed(1)} ${c[1].toFixed(1)}`;
   }
   return d + " Z";
 }
 
-function blob(svg, { x, y, rx, ry, seed, fill, opacity = 1, cls = "", onClick }) {
-  const g = document.createElementNS(SVGNS, "g");
-  g.setAttribute("transform", `translate(${x} ${y})`);
-  if (cls) g.setAttribute("class", cls);
-  const path = document.createElementNS(SVGNS, "path");
-  path.setAttribute("d", blobPath(seed, rx, ry ?? rx));
-  path.setAttribute("fill", fill);
-  path.setAttribute("opacity", opacity);
-  g.appendChild(path);
-  if (onClick) { g.classList.add("clickable"); g.addEventListener("click", onClick); }
-  svg.appendChild(g);
+function smear(svg, { x, y, rx, ry, seed, fill, opacity = 1 }) {
+  const g = el(svg, "g", { transform: `translate(${x} ${y})`,
+                           filter: "url(#paint)" });
+  el(g, "path", { d: smearPath(seed, rx, ry), fill, opacity });
   return g;
 }
 
-function label(svg, { x, y, text, size = 20, cls = "blob-label", dark = false }) {
-  const t = document.createElementNS(SVGNS, "text");
-  t.setAttribute("x", x); t.setAttribute("y", y);
-  t.setAttribute("class", cls + (dark ? " dark" : ""));
-  t.setAttribute("font-size", size);
-  t.textContent = text;
-  svg.appendChild(t);
+function text(svg, { x, y, str, size = 14, cls = "plate-text", fill, extra }) {
+  const t = el(svg, "text", { x, y, "font-size": size, ...(extra || {}) }, cls);
+  if (fill) t.setAttribute("fill", fill);
+  t.textContent = str;
   return t;
-}
-
-/* A decorative blob behind a piece of text (the menu-highlight effect). */
-function swatch(host, colour, seed, tilt = -2) {
-  const svg = document.createElementNS(SVGNS, "svg");
-  svg.setAttribute("class", "swatch");
-  svg.setAttribute("viewBox", "-60 -30 120 60");
-  svg.setAttribute("preserveAspectRatio", "none");
-  svg.style.setProperty("--tilt", `${tilt}deg`);
-  const p = document.createElementNS(SVGNS, "path");
-  p.setAttribute("d", blobPath(seed, 56, 26, 0.1, 11));
-  p.setAttribute("fill", colour);
-  svg.appendChild(p);
-  host.prepend(svg);
 }
 
 /* ------------------------------------------------------------ network */
@@ -99,10 +117,10 @@ async function call(path, body) {
   });
   const data = await res.json();
   if (data.error) { console.error(data.error); return state; }
-  const wasSolved = state && state.solved;
+  const was = state && state.solved;
   state = data;
   render();
-  if (state.solved && !wasSolved) showCurtain();
+  if (state.solved && !was) showCurtain();
   return data;
 }
 
@@ -118,22 +136,26 @@ function setPlaying(on) {
 
 function buildTitle() {
   const svg = document.querySelector(".logo-blobs");
-  [[170, 120, 92, PALETTE.blue, 3], [330, 92, 80, PALETTE.red, 7],
-   [452, 196, 74, PALETTE.yellow, 11]].forEach(([x, y, r, c, s]) =>
-    blob(svg, { x, y, rx: r, ry: r * 0.92, seed: s, fill: c }));
+  defs(svg);
+  [[250, 150, 210, 96, PALETTE.blue, 3, 0.5],
+   [470, 190, 190, 84, PALETTE.red, 7, 0.42],
+   [380, 120, 240, 70, PALETTE.amber, 13, 0.22]]
+    .forEach(([x, y, rx, ry, fill, seed, opacity]) =>
+      smear(svg, { x, y, rx, ry, seed, fill, opacity }));
 }
 
 function buildMenu() {
   const nav = $("menu");
   nav.innerHTML = "";
-  const colours = [PALETTE.blue, PALETTE.red, PALETTE.yellow];
   state.menu.forEach((lv, i) => {
     const b = document.createElement("button");
     b.className = "menu-item" + (state.completed.includes(lv.number) ? " done" : "");
-    b.innerHTML = `<span class="no">${String(lv.number).padStart(2, "0")}</span>` +
-                  `${lv.title.toUpperCase()}`;
-    swatch(b, colours[i % 3], 20 + i * 5, i % 2 ? 2 : -2.5);
-    b.onclick = () => { call("/api/level", { index: i }).then(() => showPlay()); };
+    b.innerHTML =
+      `<span class="lamp"></span>` +
+      `<span class="no">${String(lv.number).padStart(2, "0")}</span>` +
+      `<span class="plaque">${lv.title}</span>` +
+      `<span class="sub">${lv.subtitle}</span>`;
+    b.onclick = () => call("/api/level", { index: i }).then(showPlay);
     nav.appendChild(b);
   });
 }
@@ -160,7 +182,7 @@ function render() {
   const lv = state.level;
   $("hud-no").textContent = String(lv.number).padStart(2, "0");
   $("hud-name").textContent = lv.title;
-  $("hud-tick").textContent = `t ${state.t}`;
+  $("hud-tick").textContent = `T ${String(state.t).padStart(4, "0")}`;
   $("premise").textContent = lv.premise;
   $("goal").textContent = lv.goal;
   renderStage();
@@ -169,41 +191,116 @@ function render() {
   renderReadout();
 }
 
-/* One stage picture for every level: the crowd along the bottom, the single
-   conscious chunk at the top, and whatever happens in between. */
+const W = 900, APERTURE_Y = 96, RAIL = 372;
+
 function renderStage() {
   const svg = $("stage");
   svg.innerHTML = "";
-  // Room for a full-size crowd blob (r up to 70) plus its caption, and for the
-  // link arc that dips below them, without spilling past the viewBox.
-  const W = 900, TOP = 88, FLOOR = 330;
+  defs(svg);
   const n = state.level.number;
 
-  // --- the stage itself -------------------------------------------------
+  // Only the levels that route a lead under the rack need the extra depth;
+  // reserving it everywhere leaves a dead band beneath the valves.
+  const cabled = n === 4 || n === 6;
+  svg.setAttribute("viewBox", `0 0 ${W} ${cabled ? 570 : 480}`);
+
+  drawAperture(svg);
+  if (n === 3 && state.extra.tree) drawRelays(svg);
+  const shown = drawValves(svg, n);
+  if (n === 4 || n === 6) drawPatchCable(svg, shown);
+}
+
+/* The phosphor window. Whatever is conscious is what is lit here. */
+function drawAperture(svg) {
   const s = state.stage;
-  label(svg, { x: W / 2, y: 20, text: "ON STAGE", size: 12, cls: "caption" });
+  const w = 560, h = 128, x = (W - w) / 2, y = APERTURE_Y - h / 2;
+
+  // Chassis plate behind the window.
+  el(svg, "rect", { x: x - 26, y: y - 26, width: w + 52, height: h + 44,
+                    fill: "#232C2E", stroke: "#101416", "stroke-width": 1 });
+  el(svg, "rect", { x: x - 26, y: y - 26, width: w + 52, height: 2,
+                    fill: "#3A4648" });
+  [[x - 14, y - 14], [x + w + 14, y - 14],
+   [x - 14, y + h + 8], [x + w + 14, y + h + 8]]
+    .forEach(([cx, cy]) => el(svg, "circle", { cx, cy, r: 3.4, fill: "#161C1E",
+                                               stroke: "#3E4A4C" }));
+
+  // The window itself.
+  el(svg, "rect", { x, y, width: w, height: h, rx: 7, fill: "url(#phosphor)",
+                    stroke: "#0C1012", "stroke-width": 2 });
+
   if (s) {
-    const big = 58;
-    blob(svg, { x: W / 2, y: TOP, rx: big * 1.9, ry: big, seed: 99,
-                fill: hue(s.modality) });
-    const room = big * 1.9 * 1.75;                    // usable width inside it
-    const size = Math.max(15, Math.min(38, room / (s.text.length * 0.46)));
-    label(svg, { x: W / 2, y: TOP + size * 0.34, text: s.text, size,
-                 dark: darkText(s.modality) });
+    const glowFill = s.modality === "idle" ? "#6E5A2A" : hue(s.modality);
+    const g = el(svg, "g", { filter: "url(#bloom)", opacity: .5 });
+    el(g, "ellipse", { cx: W / 2, cy: APERTURE_Y, rx: 170, ry: 40,
+                       fill: glowFill });
+    const room = w * 0.84;
+    const size = Math.max(15, Math.min(34, room / (s.text.length * 0.62)));
+    text(svg, { x: W / 2, y: APERTURE_Y + size * 0.35, str: s.text, size,
+                cls: "aperture-text",
+                fill: s.modality === "idle" ? "#A0906E" : undefined });
+    text(svg, { x: W / 2, y: APERTURE_Y + 46, size: 10,
+                str: `SUBMITTED T${String(s.submitted_at).padStart(4, "0")}  ·  ` +
+                     `SOURCE ${s.owner.toUpperCase()}`, cls: "plate-text" });
   } else {
-    label(svg, { x: W / 2, y: TOP + 10, text: "silence", size: 30,
-                 cls: "caption" });
+    text(svg, { x: W / 2, y: APERTURE_Y + 6, str: "— NO SIGNAL —", size: 20,
+                cls: "plate-text" });
   }
 
-  const line = document.createElementNS(SVGNS, "path");
-  line.setAttribute("class", "rule");
-  line.setAttribute("d", `M 60 ${TOP + 102} L ${W - 60} ${TOP + 102}`);
-  svg.appendChild(line);
+  text(svg, { x: W / 2, y: y - 34, size: 11,
+              str: "SHORT TERM MEMORY · CONSCIOUS CONTENT", cls: "plate-text" });
+}
 
-  // --- level 3 draws the climb between crowd and stage ------------------
-  if (n === 3 && state.extra.tree) drawClimb(svg, W, TOP + 120, FLOOR - 78);
+/* A thermionic valve: glass envelope, ceramic base, and a filament whose
+   burn is the processor's volume. */
+function valve(svg, { x, y, scale, fill, bright, label, reading, onClick }) {
+  const g = el(svg, "g", { transform: `translate(${x} ${y}) scale(${scale})` });
+  if (onClick) { g.setAttribute("class", "clickable"); g.addEventListener("click", onClick); }
 
-  // --- the crowd --------------------------------------------------------
+  // Halo of escaping light, before the glass.
+  if (bright > 0.02) {
+    const halo = el(g, "g", { filter: "url(#bloom)", opacity: 0.16 + bright * 0.5 });
+    el(halo, "ellipse", { cx: 0, cy: -6, rx: 40, ry: 46, fill });
+  }
+
+  const body = el(g, "g", { filter: "url(#paint-fine)" });
+  // Envelope.
+  el(body, "path", {
+    d: "M -30 26 L -30 -18 Q -30 -50 0 -50 Q 30 -50 30 -18 L 30 26 Z",
+    fill: "url(#glass)", stroke: "#0E1315", "stroke-width": 2,
+  });
+  // Filament: brighter and fatter with volume.
+  el(body, "path", {
+    d: "M -13 18 L -7 -22 L 0 12 L 7 -22 L 13 18",
+    fill: "none", stroke: fill,
+    "stroke-width": 1.4 + bright * 3.6,
+    opacity: 0.25 + bright * 0.75,
+    "stroke-linejoin": "round", "stroke-linecap": "round",
+  });
+  // Base.
+  el(body, "rect", { x: -26, y: 26, width: 52, height: 20, fill: "#2A3033",
+                     stroke: "#0E1315" });
+  el(body, "rect", { x: -26, y: 32, width: 52, height: 2, fill: "#3E4749" });
+  el(body, "rect", { x: -8, y: 46, width: 5, height: 9, fill: "#1A2022" });
+  el(body, "rect", { x: 3, y: 46, width: 5, height: 9, fill: "#1A2022" });
+
+  if (label) {
+    const size = Math.min(17, Math.max(11, 150 / Math.max(label.length, 1)));
+    text(svg, { x, y: RAIL + 78, str: label.toUpperCase(), size, cls: "valve-text" });
+  }
+  if (reading) {
+    text(svg, { x, y: RAIL + 94, str: reading, size: 11, cls: "reading" });
+  }
+  return g;
+}
+
+function drawValves(svg, n) {
+  // Rail the valves are seated on.
+  el(svg, "rect", { x: 40, y: RAIL + 48, width: W - 80, height: 5,
+                    fill: "#2B3537" });
+  el(svg, "rect", { x: 40, y: RAIL + 48, width: W - 80, height: 1.5,
+                    fill: "#3E4A4C" });
+
   let show = state.blobs;
   if (n >= 3) {
     const voices = show.filter((b) => b.modality !== "idle");
@@ -218,68 +315,59 @@ function renderStage() {
     }
   }
   show = show.slice(0, 8);
+
   const maxF = Math.max(...show.map((b) => b.f), 0.001);
   show.forEach((b, i) => {
     const x = W * ((i + 0.5) / show.length);
-    const r = 26 + 44 * Math.sqrt(b.f / maxF);
-    const clickable = n === 1;
-    blob(svg, {
-      x, y: FLOOR, rx: r * 1.25, ry: r, seed: b.address + 3, fill: hue(b.modality),
-      onClick: clickable ? () => act("louder", b.name) : null,
+    const frac = b.f / maxF;
+    valve(svg, {
+      x, y: RAIL, scale: 0.62 + 0.5 * Math.sqrt(frac),
+      fill: hue(b.modality), bright: Math.sqrt(frac),
+      label: b.text, reading: `${b.f}`,
+      onClick: n === 1 ? () => act("louder", b.name) : null,
     });
-    const size = Math.min(26, 12 + r * 0.28);
-    const fits = b.text.length * size * 0.46 < r * 2.3;
-    if (fits) {
-      label(svg, { x, y: FLOOR + 8, text: b.text, size, dark: darkText(b.modality) });
-      label(svg, { x, y: FLOOR + r + 22, text: `volume ${b.f}`, size: 12,
-                   cls: "caption" });
-    } else {
-      label(svg, { x, y: FLOOR + r + 26, text: b.text, size: 20, dark: true });
-      label(svg, { x, y: FLOOR + r + 44, text: `volume ${b.f}`, size: 12,
-                   cls: "caption" });
-    }
   });
-
-  if (n === 4 || n === 6) drawLink(svg, W, FLOOR);
+  return show;
 }
 
-/* The tree, drawn only as far as it needs to be understood: rows of small
-   marks, with the shouted chunk coloured as it climbs. */
-function drawClimb(svg, W, top, bottom) {
+/* The relay lattice a chunk has to climb. */
+function drawRelays(svg) {
   const levels = state.extra.tree;
-  const rows = levels.length;
+  const rows = levels.length, top = 206, bottom = 300;
   for (let s = rows - 1; s >= 1; s--) {
     const y = top + ((rows - 1 - s) / (rows - 1)) * (bottom - top);
+    text(svg, { x: 30, y: y + 4, str: `T−${s}`, size: 10, cls: "reading" });
     levels[s].forEach((node, i) => {
       const x = W * ((i + 0.5) / levels[s].length);
-      const loud = !node.silent && node.f > 5;
-      blob(svg, {
-        x, y, rx: loud ? 15 : 7, ry: loud ? 10 : 5, seed: s * 31 + i,
-        fill: loud ? PALETTE.red : PALETTE.idle, opacity: loud ? 1 : 0.7,
+      const live = !node.silent && node.f > 5;
+      if (live) {
+        const g = el(svg, "g", { filter: "url(#bloom)", opacity: .85 });
+        el(g, "circle", { cx: x, cy: y, r: 6, fill: PALETTE.amber });
+      }
+      el(svg, "circle", {
+        cx: x, cy: y, r: live ? 4.5 : 2.6,
+        fill: live ? PALETTE.amberHi : "#33403F",
       });
     });
-    label(svg, { x: 22, y: y + 4, text: `t−${s}`, size: 11, cls: "caption" });
   }
 }
 
-/* The route that skips the stage entirely. */
-function drawLink(svg, W, floor) {
+/* The patch cable: a lead that runs from one valve to another around the back
+   of the rack, so nothing on it ever reaches the aperture. */
+function drawPatchCable(svg, shown) {
   const on = state.level.number === 6 ||
              (state.extra.routes && state.extra.routes.unconscious > 0);
-  if (!on) return;
-  const blobs = state.blobs.slice(0, 8);
-  if (blobs.length < 2) return;
-  const a = W * (0.5 / blobs.length), b = W * ((blobs.length - 0.5) / blobs.length);
-  const dip = floor + 100;
-  const p = document.createElementNS(SVGNS, "path");
-  p.setAttribute("d", `M ${a} ${floor + 46} C ${a} ${dip}, ${b} ${dip}, ${b} ${floor + 46}`);
-  p.setAttribute("fill", "none");
-  p.setAttribute("stroke", PALETTE.red);
-  p.setAttribute("stroke-width", 2.5);
-  p.setAttribute("stroke-dasharray", "7 6");
-  svg.appendChild(p);
-  label(svg, { x: W / 2, y: dip + 4, size: 13, cls: "caption",
-               text: "straight to the body — never reaches the stage" });
+  if (!on || shown.length < 2) return;
+  const a = W * (0.5 / shown.length) - 34;
+  const b = W * ((shown.length - 0.5) / shown.length) + 34;
+  const dip = RAIL + 150;
+  const d = `M ${a} ${RAIL + 44} C ${a} ${dip}, ${b} ${dip}, ${b} ${RAIL + 44}`;
+  el(svg, "path", { d, fill: "none", stroke: "#7A3126", "stroke-width": 6,
+                    "stroke-linecap": "round", filter: "url(#paint-fine)" });
+  el(svg, "path", { d, fill: "none", stroke: PALETTE.red, "stroke-width": 2.4,
+                    "stroke-dasharray": "10 8", "stroke-linecap": "round" });
+  text(svg, { x: W / 2, y: dip - 6, size: 11, cls: "plate-text",
+              str: "PATCH LEAD · BYPASSES THE APERTURE ENTIRELY" });
 }
 
 /* ---------------------------------------------------------- controls */
@@ -287,41 +375,22 @@ function drawLink(svg, W, floor) {
 function renderControls() {
   const box = $("controls");
   box.innerHTML = "";
-  const n = state.level.number;
 
-  state.level.controls.forEach((c, i) => {
+  state.level.controls.forEach((c) => {
     if (c.kind === "blobs") {
       const p = document.createElement("p");
-      p.className = "premise";
-      p.style.margin = "0";
-      p.textContent = c.label;
+      p.className = "note";
+      p.textContent = "Strike a valve to raise its filament";
       box.appendChild(p);
     }
 
-    if (c.kind === "run") {
+    if (c.kind === "run" || c.kind === "shout" || c.kind === "stove") {
       const b = document.createElement("button");
       b.className = "big";
       b.textContent = c.label;
-      swatch(b, PALETTE.blue, 41);
-      b.onclick = () => step(c.value);
-      box.appendChild(b);
-    }
-
-    if (c.kind === "shout") {
-      const b = document.createElement("button");
-      b.className = "big";
-      b.textContent = c.label;
-      swatch(b, PALETTE.red, 47);
-      b.onclick = () => act("shout", true);
-      box.appendChild(b);
-    }
-
-    if (c.kind === "stove") {
-      const b = document.createElement("button");
-      b.className = "big";
-      b.textContent = c.label;
-      swatch(b, PALETTE.red, 53);
-      b.onclick = () => act("stove", true);
+      b.onclick = c.kind === "run" ? () => step(c.value)
+                : c.kind === "shout" ? () => act("shout", true)
+                : () => act("stove", true);
       box.appendChild(b);
     }
 
@@ -345,20 +414,17 @@ function renderControls() {
                : state.extra.count_on;
       const b = document.createElement("button");
       b.className = "switch" + (on ? " on" : "");
-      b.innerHTML = `<span class="box"><svg viewBox="0 0 20 20">
-        <path d="M4 10 L8 15 L16 5" stroke="#EDEAE3" stroke-width="2.6"
-              fill="none" stroke-linecap="round"/></svg></span>
-        <span>${c.label}</span>`;
+      b.innerHTML = `<span class="box"></span>` +
+                    `<span class="switch-label">${c.label}</span>`;
       b.onclick = () => act(c.id, !on);
       box.appendChild(b);
     }
   });
 
-  // Everyone gets a way to move the clock by hand.
   if (state.level.autoplay) {
     const b = document.createElement("button");
     b.className = "link-btn";
-    b.textContent = playing ? "pause" : "resume";
+    b.textContent = playing ? "halt clock" : "resume clock";
     b.onclick = () => { setPlaying(!playing); renderControls(); };
     box.appendChild(b);
   }
@@ -385,11 +451,11 @@ function renderReadout() {
 
   if (n === 2 && e.tally) {
     box.innerHTML = `<table><tr>
-        <td></td><td class="r">won</td>
-        <td class="r">measured</td><td class="r strong">predicted</td></tr>` +
+        <td></td><td class="r">WON</td>
+        <td class="r">MEASURED</td><td class="r strong">PREDICTED</td></tr>` +
       e.tally.map((r) => `<tr>
         <td><span class="bar" style="background:${hue(r.modality)};
-            width:${Math.max(6, r.measured * 160)}px"></span></td>
+            width:${Math.max(6, r.measured * 150)}px"></span></td>
         <td class="r">${r.won}</td>
         <td class="r">${(r.measured * 100).toFixed(1)}%</td>
         <td class="r strong">${(r.predicted * 100).toFixed(1)}%</td></tr>`).join("") +
@@ -398,43 +464,46 @@ function renderReadout() {
 
   if (n === 3) {
     const bits = [];
-    if (e.shouted_at !== null) bits.push(`you shouted at t ${e.shouted_at}`);
-    if (e.heard_at !== null) bits.push(`you heard it at t ${e.heard_at}`);
-    if (e.lag !== null) bits.push(`<span class="strong">${e.lag} ticks later</span>`);
-    box.innerHTML = bits.length ? `<p class="say">${bits.join(" · ")}</p>` : "";
+    if (e.shouted_at !== null) bits.push(`SIGNAL SENT T${e.shouted_at}`);
+    if (e.heard_at !== null) bits.push(`LIT AT T${e.heard_at}`);
+    if (e.lag !== null) bits.push(`<span class="strong">${e.lag} TICKS</span>`);
+    box.innerHTML = bits.length ? `<p class="say">${bits.join("  ·  ")}</p>` : "";
   }
 
   if (n === 4) {
     box.innerHTML = `<table>
-      <tr><td>the obstacle reached the stage</td>
-          <td class="r strong">${e.aware ? "yes" : "no"}</td></tr>
-      <tr><td>body steered around it</td>
-          <td class="r strong">${e.routes.conscious + e.routes.unconscious} times</td></tr>
-      <tr><td>&nbsp;&nbsp;knowingly</td><td class="r">${e.routes.conscious}</td></tr>
-      <tr><td>&nbsp;&nbsp;without knowing</td><td class="r">${e.routes.unconscious}</td></tr>
-      </table><p class="say">“${e.said}”</p>`;
+      <tr><td>OBSTACLE REACHED THE APERTURE</td>
+          <td class="r strong">${e.aware ? "YES" : "NO"}</td></tr>
+      <tr><td>BODY STEERED AROUND IT</td>
+          <td class="r strong">${e.routes.conscious + e.routes.unconscious}×</td></tr>
+      <tr><td>&nbsp;&nbsp;KNOWINGLY</td><td class="r">${e.routes.conscious}</td></tr>
+      <tr><td>&nbsp;&nbsp;WITHOUT KNOWING</td>
+          <td class="r">${e.routes.unconscious}</td></tr>
+      </table><p class="say" style="margin-top:.7rem">“${e.said}”</p>`;
   }
 
   if (n === 5) {
-    const scoreline = `it reached the stage on ${e.got_through} of
-                       ${e.watched} ticks while the counting ran`;
+    const line = `it reached the aperture on ${e.got_through} of ${e.watched}
+                  ticks while the counting ran`;
     box.innerHTML =
       e.phase === "miss"
         ? `<p class="say">with the counting running, the gorilla reached the
-           stage on ${e.got_through} of ${e.watched} ticks</p>`
+           aperture on ${e.got_through} of ${e.watched} ticks</p>`
         : e.count_on
-        ? `<p class="say">${scoreline}. now switch the counting off.</p>`
-        : `<p class="say">${scoreline} — with it off, seen
+        ? `<p class="say">${line}. now throw the counting switch.</p>`
+        : `<p class="say">${line} — with it off, seen
            ${e.seen_after} time${e.seen_after === 1 ? "" : "s"}.</p>`;
   }
 
   if (n === 6 && e.acted_at !== null) {
     box.innerHTML = `<table>
-      <tr><td>hand touched the stove</td><td class="r">t ${e.touched_at}</td></tr>
-      <tr><td>hand pulled away</td><td class="r strong">t ${e.acted_at}</td></tr>
-      <tr><td>pain felt</td><td class="r strong">${
-        e.felt_at === null ? "not yet" : "t " + e.felt_at}</td></tr>
-      </table>` + (e.gap ? `<p class="say">it moved ${e.gap} ticks before it hurt</p>` : "");
+      <tr><td>HAND TOUCHED THE STOVE</td><td class="r">T${e.touched_at}</td></tr>
+      <tr><td>HAND PULLED AWAY</td><td class="r strong">T${e.acted_at}</td></tr>
+      <tr><td>PAIN LIT IN THE APERTURE</td><td class="r strong">${
+        e.felt_at === null ? "NOT YET" : "T" + e.felt_at}</td></tr>
+      </table>` +
+      (e.gap ? `<p class="say" style="margin-top:.7rem">it moved
+        ${e.gap} ticks before it hurt</p>` : "");
   }
 }
 
@@ -448,9 +517,10 @@ function showCurtain() {
   $("done-lesson").textContent = lv.lesson;
   const svg = document.querySelector(".card-blob");
   svg.innerHTML = "";
-  blob(svg, { x: 150, y: 80, rx: 130, ry: 62, seed: lv.number * 13,
-              fill: [PALETTE.yellow, PALETTE.blue, PALETTE.red][lv.number % 3],
-              opacity: 0.85 });
+  defs(svg);
+  smear(svg, { x: 220, y: 120, rx: 200, ry: 92, seed: lv.number * 17,
+               fill: [PALETTE.blue, PALETTE.red, PALETTE.amber][lv.number % 3],
+               opacity: 0.4 });
   $("btn-next").hidden = state.index >= state.count - 1;
   $("curtain").hidden = false;
 }
@@ -461,7 +531,6 @@ function wire() {
   $("btn-menu").onclick = showMenu;
   $("btn-again").onclick = () => call("/api/retry", {}).then(showPlay);
   $("btn-next").onclick = () => call("/api/next", {}).then(showPlay);
-  swatch($("btn-next"), PALETTE.yellow, 61);
   document.addEventListener("keydown", (e) => {
     if ($("screen-play").hidden) return;
     if (e.key === " ") { e.preventDefault(); step(1); }

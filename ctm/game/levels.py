@@ -127,12 +127,13 @@ class L1(Level):
     title = "One stage"
     subtitle = "Short Term Memory holds exactly one thing"
     premise = ("Three processors are talking at once. Only one of them can be "
-               "conscious. Louder is likelier — click a blob to give it volume.")
+               "conscious. Louder is likelier — strike a valve to run its "
+               "filament hotter.")
     goal = "Get HUNGER onto the stage three times."
     lesson = ("There is no chooser. Nothing decided that hunger mattered — it "
               "simply arrived loudest at a coin flip. Consciousness in the CTM "
               "is a bottleneck, not a decision.")
-    controls = [{"kind": "blobs", "label": "Click a blob to make it louder"}]
+    controls = [{"kind": "blobs", "label": "Strike a valve to raise its filament"}]
 
     def build(self):
         self.voices = [

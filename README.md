@@ -72,8 +72,14 @@ reach. The model underneath is the same CTM the tests exercise.
 06  BEFORE YOU FEEL IT   the delay behind free will
 ```
 
-Chunks are drawn as torn-paper blobs sized by volume, and exactly one of them is
-on the stage at any moment. Level 4 is the one to play if you only play one: you
+The machine is drawn as institutional valve-computing hardware: each processor
+is a thermionic tube whose filament burns at its volume, and the single conscious
+chunk is what gets lit in the amber phosphor aperture above the rack. A link is a
+patch lead that runs under the rack, bypassing the aperture entirely. Shapes are
+displaced through turbulence so their edges scumble like paint rather than
+resolving as vector art.
+
+Level 4 is the one to play if you only play one: you
 have an eye that works, an obstacle in front of you, and two switches. Quieting
 the eye does not blind it — the percept still reaches the body through the link
 and still steers it. What is missing is the broadcast, and the broadcast is all

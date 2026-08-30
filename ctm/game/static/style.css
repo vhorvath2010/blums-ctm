@@ -1,64 +1,69 @@
-/* Torn paper on a warm ground: cobalt, vermilion, ochre and ink, nothing else.
-   No cards, no borders, no boxes -- shapes and whitespace do the work. */
+/* An apparatus, not a poster.
+ *
+ * The machine is imagined as institutional valve-computing hardware: enamelled
+ * steel, stencilled plates, one amber phosphor aperture where the conscious
+ * chunk is lit. Colour is oxidised and muddy -- ochre, verdigris, oxide red,
+ * cold slate -- with amber reserved almost entirely for what is conscious, so
+ * the eye reads the stage before it reads anything else.
+ *
+ * Everything is painted rather than drawn: shapes take a turbulence
+ * displacement so their edges scumble, and a grain layer sits over the page.
+ * Single-world by intent -- there is no light variant, and every colour is
+ * stated explicitly so it holds on any host background.
+ */
 
 :root {
-  --paper:  #EDEAE3;
-  --paper-2:#E4E0D7;
-  --ink:    #1B1815;
-  --ink-2:  #55504A;
-  --faint:  #8C857B;
+  --void:    #14181A;   /* behind everything */
+  --steel:   #222B2D;   /* the chassis */
+  --steel-2: #2C3739;   /* raised plate */
+  --steel-3: #384446;   /* bezel highlight */
+  --seam:    #101416;   /* recessed seam */
 
-  --blue:   #4A6FB5;
-  --red:    #BE3A25;
-  --yellow: #EFC034;
-  --green:  #5E8C61;
+  --enamel:  #C9BFA6;   /* stencilled paint */
+  --enamel-2:#8E8875;   /* worn stencil */
+  --faint:   #5E655F;
 
-  --measure: 34rem;
+  --amber:   #E9A93C;   /* phosphor: conscious content */
+  --amber-hi:#F7D08A;
+  --verdi:   #4E8177;   /* oxidised copper */
+  --oxide:   #9A4232;   /* oxide red */
+  --moss:    #77854A;   /* signal green */
+  --slate:   #55697A;   /* cold slate: the crowd */
+
+  --measure: 36rem;
 }
 
-/* The reference is a painted, single-world design; it commits to paper rather
-   than following the viewer's theme.  Everything is painted explicitly so it
-   holds on any host background. */
-
 * { box-sizing: border-box; }
-
-/* A class that sets `display` outranks the UA rule behind the hidden attribute,
-   so screens marked hidden would otherwise stay on screen and stack. */
 [hidden] { display: none !important; }
 
 html, body { height: 100%; }
 
 body {
   margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font: 400 17px/1.6 Bitter, Georgia, "Times New Roman", serif;
+  background: radial-gradient(120% 90% at 50% 0%, #1D2426 0%, var(--void) 68%);
+  color: var(--enamel);
+  font: 400 17px/1.62 Spectral, Georgia, serif;
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2 { margin: 0; font-weight: 400; text-wrap: balance; }
-
-button {
-  font-family: Bitter, Georgia, serif;
-  cursor: pointer;
-  border: none;
-  background: none;
-  color: inherit;
+/* Canvas tooth over the whole page. */
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: 100; pointer-events: none;
+  opacity: .15;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
 }
-button:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
 
-hr {
-  border: none;
-  border-top: 1.5px solid var(--ink);
-  width: min(28rem, 70vw);
-  margin: 2.2rem auto;
-}
+h1, h2 { margin: 0; font-weight: 600; text-wrap: balance; }
+
+button { font-family: inherit; cursor: pointer; border: none; background: none;
+         color: inherit; }
+button:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
 
 .screen {
   min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: flex; flex-direction: column; align-items: center;
   padding: 3rem 1.5rem 4rem;
 }
 
@@ -66,204 +71,268 @@ hr {
 
 .title-screen { justify-content: center; text-align: center; }
 
-.logo { position: relative; display: inline-block; padding: 1.5rem 2.5rem; }
+.logo { position: relative; display: inline-block; padding: 2.2rem 3rem; }
 .logo-blobs {
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  z-index: 0; overflow: visible;
+  position: absolute; inset: -2rem;
+  width: calc(100% + 4rem); height: calc(100% + 4rem); overflow: visible;
 }
 .logo h1 {
-  position: relative; z-index: 1;
-  font-family: "Caveat Brush", Bitter, cursive;
-  font-size: clamp(3.2rem, 9vw, 6rem);
-  line-height: .92;
-  letter-spacing: .01em;
+  position: relative;
+  font-family: "Saira Condensed", "Arial Narrow", sans-serif;
+  font-weight: 700; text-transform: uppercase;
+  font-size: clamp(2.3rem, 7vw, 4.4rem);
+  line-height: .98; letter-spacing: .045em;
+  color: var(--enamel);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .5);
+}
+.logo h1 em {
+  display: block; font-style: normal; color: var(--amber);
+  text-shadow: 0 0 26px rgba(233, 169, 60, .4), 0 2px 0 rgba(0, 0, 0, .55);
 }
 
 .byline {
-  margin: 1.4rem 0 0; font-style: italic; color: var(--ink-2);
-  font-size: 1.05rem;
+  margin: 1.7rem 0 0; color: var(--enamel-2); font-style: italic;
+  font-size: 1.02rem;
 }
-.footnote { margin: 3rem 0 0; color: var(--faint); font-size: .85rem; }
+.footnote { margin: 3.2rem 0 0; color: var(--faint); font-size: .82rem; }
 
-.menu { display: flex; flex-direction: column; gap: .1rem; align-items: center; }
+.plate-rule {
+  width: min(30rem, 76vw); height: 3px; margin: 2.4rem auto;
+  background: linear-gradient(90deg, transparent, var(--steel-3) 12%,
+              var(--steel-3) 88%, transparent);
+  border-top: 1px solid rgba(0, 0, 0, .5);
+}
+
+.menu { display: flex; flex-direction: column; gap: .45rem;
+        width: min(36rem, 92vw); }
 
 .menu-item {
-  position: relative;
-  font-size: clamp(1.3rem, 3.4vw, 1.9rem);
-  text-transform: uppercase;
-  letter-spacing: .04em;
-  padding: .5rem 1.6rem;
-  color: var(--ink);
-  transition: transform .14s ease;
+  display: flex; align-items: center; gap: .95rem;
+  padding: .72rem 1.05rem;
+  background: linear-gradient(180deg, var(--steel-2), var(--steel));
+  border: 1px solid var(--seam); border-top-color: var(--steel-3);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .04);
+  color: var(--enamel); text-align: left;
+  transition: transform .12s ease, filter .12s ease;
 }
-.menu-item .swatch {
-  position: absolute; left: 50%; top: 50%;
-  transform: translate(-50%, -50%) rotate(var(--tilt, -2deg));
-  width: 108%; height: 82%;
-  z-index: -1; opacity: 0;
-  transition: opacity .14s ease;
-}
-.menu-item:hover, .menu-item:focus-visible { transform: translateY(-1px); }
-.menu-item:hover .swatch, .menu-item:focus-visible .swatch { opacity: 1; }
+.menu-item:hover { transform: translateX(2px); filter: brightness(1.12); }
+.menu-item:hover .plaque { color: var(--amber-hi); }
 .menu-item .no {
-  font-size: .62em; color: var(--faint); margin-right: .7rem;
-  font-variant-numeric: tabular-nums;
+  font-family: "Share Tech Mono", monospace; font-size: 1.02rem;
+  color: var(--enamel-2); flex: none;
 }
-.menu-item.done .no { color: var(--green); }
-.menu-item.done .no::after { content: " ✓"; }
+.menu-item .plaque {
+  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
+  letter-spacing: .12em; font-weight: 600; font-size: 1.04rem;
+  white-space: nowrap;
+}
+.menu-item .sub {
+  margin-left: auto; text-align: right;
+  font-size: .78rem; color: var(--faint); font-style: italic;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* Indicator lamp: dark until the level is cleared. */
+.menu-item .lamp {
+  width: .6rem; height: .6rem; border-radius: 50%; flex: none;
+  background: #1A2022; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .6);
+}
+.menu-item.done .lamp {
+  background: var(--amber);
+  box-shadow: 0 0 9px rgba(233, 169, 60, .85), inset 0 0 0 1px rgba(0, 0, 0, .4);
+}
 
 /* -------------------------------------------------------------- play */
 
-.play-screen { padding-top: 1.4rem; }
+.play-screen { padding-top: 1.2rem; }
 
 .hud {
-  width: 100%; max-width: 62rem;
-  display: flex; align-items: baseline; gap: .9rem;
-  padding-bottom: .9rem; margin-bottom: 1.6rem;
-  border-bottom: 1.5px solid var(--ink);
+  width: 100%; max-width: 64rem;
+  display: flex; align-items: center; gap: 1rem;
+  padding: .55rem .9rem; margin-bottom: 1.3rem;
+  background: linear-gradient(180deg, var(--steel-2), var(--steel));
+  border: 1px solid var(--seam); border-top-color: var(--steel-3);
 }
 .spacer { flex: 1; }
 .link-btn {
-  font-size: .9rem; color: var(--ink-2); text-decoration: underline;
-  text-underline-offset: 3px; padding: 0;
+  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
+  letter-spacing: .1em; font-size: .78rem; color: var(--enamel-2);
 }
-.link-btn:hover { color: var(--ink); }
+.link-btn:hover { color: var(--amber); }
 .level-no {
-  font-family: "Caveat Brush", cursive; font-size: 1.6rem; line-height: 1;
+  font-family: "Share Tech Mono", monospace; font-size: 1.12rem; color: var(--amber);
 }
-.level-name { text-transform: uppercase; letter-spacing: .07em; font-size: .95rem; }
+.level-name {
+  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
+  letter-spacing: .14em; font-size: .9rem; font-weight: 600;
+}
 .tick {
-  font-size: .9rem; color: var(--faint); font-variant-numeric: tabular-nums;
+  font-family: "Share Tech Mono", monospace; font-size: .9rem;
+  color: var(--amber); text-shadow: 0 0 10px rgba(233, 169, 60, .45);
 }
 
-.premise, .goal {
-  max-width: var(--measure); text-align: center; margin: 0 auto;
-}
-.premise { color: var(--ink-2); font-size: 1.02rem; }
+.premise, .goal { max-width: var(--measure); text-align: center; margin: 0 auto; }
+.premise { color: var(--enamel-2); font-size: 1rem; }
 .goal {
-  margin-top: 1.6rem; font-weight: 600; font-size: 1.08rem;
+  margin-top: 1.5rem; font-size: 1rem; color: var(--enamel);
+  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
+  letter-spacing: .1em; font-weight: 600;
 }
-.goal::before { content: "→ "; color: var(--red); }
+.goal::before {
+  content: "\25B6"; color: var(--amber); margin-right: .55rem; font-size: .78em;
+}
 
-.stage-wrap { width: 100%; max-width: 62rem; margin: 1.2rem 0 .4rem; }
+.stage-wrap { width: 100%; max-width: 64rem; margin: 2rem 0 .3rem; }
 .stage { width: 100%; height: auto; display: block; overflow: visible; }
 
-.stage .blob-label {
-  font-family: "Caveat Brush", cursive;
-  fill: var(--paper);
-  text-anchor: middle;
-  pointer-events: none;
+.stage .aperture-text {
+  font-family: "Share Tech Mono", monospace;
+  fill: var(--amber-hi); text-anchor: middle; pointer-events: none;
 }
-.stage .blob-label.dark { fill: var(--ink); }
-.stage .caption {
-  font-family: Bitter, serif; font-size: 13px; fill: var(--faint);
-  text-anchor: middle;
+.stage .plate-text {
+  font-family: "Saira Condensed", sans-serif; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .16em;
+  fill: var(--enamel-2); text-anchor: middle; font-size: 11px;
+}
+.stage .valve-text {
+  font-family: "Saira Condensed", sans-serif; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .05em;
+  fill: var(--enamel); text-anchor: middle;
+}
+.stage .reading {
+  font-family: "Share Tech Mono", monospace; font-size: 11px;
+  fill: var(--enamel-2); text-anchor: middle;
 }
 .stage .clickable { cursor: pointer; }
-.stage .clickable:hover { opacity: .82; }
-.stage .rule { stroke: var(--ink); stroke-width: 1.5; }
-.stage .rule.faint { stroke: var(--faint); stroke-dasharray: 3 5; stroke-width: 1; }
+.stage .clickable:hover { filter: brightness(1.3); }
 
 /* --------------------------------------------------------- controls */
 
 .controls {
-  display: flex; flex-wrap: wrap; gap: .8rem 1.4rem;
-  justify-content: center; align-items: center;
-  margin-top: 1.4rem;
+  display: flex; flex-wrap: wrap; gap: .9rem 1.5rem;
+  justify-content: center; align-items: center; margin-top: 1.4rem;
+}
+.controls .note {
+  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
+  letter-spacing: .1em; font-size: .78rem; color: var(--enamel-2); margin: 0;
 }
 
+/* A push-button that stands proud of the chassis and depresses when struck. */
 .big {
-  position: relative;
-  font-size: 1.25rem; text-transform: uppercase; letter-spacing: .05em;
-  padding: .6rem 1.8rem;
+  font-family: "Saira Condensed", sans-serif; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .14em; font-size: 1rem;
+  padding: .76rem 2rem; color: #17110A;
+  background: linear-gradient(180deg, var(--amber-hi), var(--amber) 55%, #B87F23);
+  border: 1px solid #0E1214;
+  box-shadow: 0 4px 0 #6E4A15, 0 6px 14px rgba(0, 0, 0, .5);
+  transition: filter .12s ease;
 }
-.big .swatch {
-  position: absolute; left: 50%; top: 50%;
-  transform: translate(-50%, -50%) rotate(-1.5deg);
-  width: 106%; height: 88%; z-index: -1;
-}
-.big:hover { transform: translateY(-1px); }
+.big:hover { filter: brightness(1.07); }
+.big:active { transform: translateY(3px); box-shadow: 0 1px 0 #6E4A15; }
 
-.switch {
-  display: inline-flex; align-items: center; gap: .6rem;
-  font-size: 1rem; cursor: pointer;
-}
+/* A toggle with a physical throw. */
+.switch { display: inline-flex; align-items: center; gap: .7rem; }
 .switch .box {
-  width: 1.5rem; height: 1.5rem; flex: none;
-  border: 1.5px solid var(--ink); border-radius: 2px;
-  display: grid; place-items: center;
+  width: 2.5rem; height: 1.32rem; flex: none; position: relative;
+  background: var(--seam); border: 1px solid #0B0E10;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, .7);
 }
-.switch.on .box { background: var(--ink); }
-.switch .box svg { width: 1rem; height: 1rem; display: none; }
-.switch.on .box svg { display: block; }
+.switch .box::after {
+  content: ""; position: absolute; top: 1px; left: 1px;
+  width: 1.02rem; height: calc(100% - 2px);
+  background: linear-gradient(180deg, var(--steel-3), var(--steel));
+  border: 1px solid #0B0E10;
+  transition: transform .16s cubic-bezier(.3, 1.4, .5, 1);
+}
+.switch.on .box { background: #3A2A10; }
+.switch.on .box::after {
+  transform: translateX(1.3rem);
+  background: linear-gradient(180deg, var(--amber-hi), var(--amber));
+  box-shadow: 0 0 10px rgba(233, 169, 60, .6);
+}
+.switch .switch-label {
+  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
+  letter-spacing: .1em; font-size: .84rem; font-weight: 600;
+}
+.switch.on .switch-label { color: var(--amber-hi); }
 
 .guess { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
-.guess .label { font-size: .95rem; color: var(--ink-2); }
-.guess button {
-  font-size: 1.1rem; padding: .35rem .9rem;
-  border: 1.5px solid var(--ink); border-radius: 2px;
-  font-variant-numeric: tabular-nums;
+.guess .label {
+  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
+  letter-spacing: .1em; font-size: .78rem; color: var(--enamel-2);
 }
-.guess button.picked { background: var(--ink); color: var(--paper); }
+.guess button {
+  font-family: "Share Tech Mono", monospace; font-size: 1.02rem;
+  padding: .4rem 1rem; color: var(--enamel);
+  background: linear-gradient(180deg, var(--steel-2), var(--steel));
+  border: 1px solid var(--seam); border-top-color: var(--steel-3);
+}
+.guess button.picked {
+  background: linear-gradient(180deg, var(--amber-hi), var(--amber)); color: #17110A;
+}
 
 /* --------------------------------------------------------- progress */
 
 .progress {
-  display: flex; gap: .4rem; align-items: center; justify-content: center;
-  margin-top: 1rem; font-size: .9rem; color: var(--ink-2);
+  display: flex; gap: .5rem; align-items: center; justify-content: center;
+  margin-top: 1.05rem;
+  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
+  letter-spacing: .11em; font-size: .76rem; color: var(--enamel-2);
 }
-.pips { display: flex; gap: .28rem; }
+.pips { display: flex; gap: .3rem; }
 .pip {
-  width: .55rem; height: .55rem; border-radius: 50%;
-  border: 1.5px solid var(--ink-2);
+  width: .5rem; height: .5rem; border-radius: 50%;
+  background: #171D1F; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .6);
 }
-.pip.on { background: var(--ink); border-color: var(--ink); }
+.pip.on { background: var(--amber); box-shadow: 0 0 7px rgba(233, 169, 60, .75); }
 
 .readout {
   margin-top: 1.4rem; max-width: var(--measure); width: 100%;
-  font-size: .95rem; color: var(--ink-2);
+  font-family: "Share Tech Mono", monospace; font-size: .86rem;
+  color: var(--enamel-2);
+  background: linear-gradient(180deg, #191F21, #141819);
+  border: 1px solid var(--seam); border-top-color: var(--steel-3);
+  padding: .85rem 1.1rem;
 }
+.readout:empty { display: none; }
 .readout table { width: 100%; border-collapse: collapse; }
-.readout td {
-  padding: .3rem 0; font-variant-numeric: tabular-nums;
-  border-bottom: 1px solid var(--paper-2);
-}
+.readout td { padding: .28rem 0; border-bottom: 1px solid rgba(255, 255, 255, .05); }
+.readout tr:last-child td { border-bottom: none; }
 .readout td.r { text-align: right; }
-.readout .strong { color: var(--ink); font-weight: 600; }
-.readout .bar { height: .5rem; border-radius: 1px; display: block; }
+.readout .strong { color: var(--amber); }
+.readout .bar { height: .55rem; display: block; }
 .readout .say {
-  font-style: italic; color: var(--ink); text-align: center;
-  font-size: 1.05rem; margin: .2rem 0 0;
+  margin: 0; text-align: center; color: var(--amber-hi);
+  text-shadow: 0 0 12px rgba(233, 169, 60, .3);
 }
 
 /* ---------------------------------------------------------- curtain */
 
 .curtain {
   position: fixed; inset: 0; z-index: 40;
-  /* Opaque: at 88% the game showed through and collided with the card. */
-  background: var(--paper);
+  background: radial-gradient(90% 70% at 50% 40%, #1E2528, var(--void) 75%);
   display: grid; place-items: center; padding: 2rem;
-  animation: fade .25s ease;
+  animation: lift .3s ease;
 }
-@keyframes fade { from { opacity: 0; } }
+@keyframes lift { from { opacity: 0; transform: translateY(6px); } }
 
-.card {
-  position: relative; max-width: 32rem; text-align: center;
-  padding: 2rem 1rem;
-}
+.card { position: relative; max-width: 34rem; text-align: center; padding: 1rem; }
 .card-blob {
-  position: absolute; top: 1.4rem; left: 50%;
-  transform: translateX(-50%); width: 16rem; height: 8rem;
-  z-index: -1; overflow: visible;
+  position: absolute; top: -2.5rem; left: 50%; transform: translateX(-50%);
+  width: 22rem; height: 12rem; z-index: -1; overflow: visible;
 }
 .eyebrow {
-  margin: 0 0 .4rem; text-transform: uppercase; letter-spacing: .12em;
-  font-size: .78rem; color: var(--ink-2);
+  margin: 0 0 .7rem;
+  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
+  letter-spacing: .3em; font-size: .74rem; color: var(--amber);
 }
-.card h2 { font-family: "Caveat Brush", cursive; font-size: 2.6rem; line-height: 1; }
-.lesson { margin: 1.2rem 0 0; color: var(--ink-2); }
+.card h2 {
+  font-family: "Saira Condensed", sans-serif; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em;
+  font-size: clamp(1.9rem, 5vw, 2.9rem); line-height: 1; color: var(--enamel);
+}
+.lesson { margin: 1.4rem 0 0; color: var(--enamel-2); font-size: 1.02rem; }
 .card-actions {
-  margin-top: 2rem; display: flex; gap: 1.6rem;
+  margin-top: 2.2rem; display: flex; gap: 1.8rem;
   align-items: center; justify-content: center;
 }
 
@@ -274,4 +343,5 @@ hr {
 @media (max-width: 560px) {
   body { font-size: 16px; }
   .hud { flex-wrap: wrap; }
+  .menu-item .sub { display: none; }
 }

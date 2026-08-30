@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>A Machine That Notices</title>
+<title>Apparatus of Attention</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Bitter:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Share+Tech+Mono&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -14,11 +14,11 @@
 <!-- ------------------------------------------------------------- title -->
 <section class="screen title-screen" id="screen-title">
   <div class="logo">
-    <svg class="logo-blobs" viewBox="0 0 640 300" aria-hidden="true"></svg>
-    <h1>A Machine<br>That Notices</h1>
+    <svg class="logo-blobs" viewBox="0 0 760 340" aria-hidden="true"></svg>
+    <h1>Apparatus of<em>Attention</em></h1>
   </div>
-  <p class="byline">the Conscious Turing Machine, in six levels</p>
-  <hr>
+  <p class="byline">a conscious turing machine, in six exercises</p>
+  <div class="plate-rule"></div>
   <nav class="menu" id="menu"></nav>
   <p class="footnote">after Lenore &amp; Manuel Blum, PNAS 2022</p>
 </section>
@@ -26,18 +26,18 @@
 <!-- -------------------------------------------------------------- play -->
 <section class="screen play-screen" id="screen-play" hidden>
   <header class="hud">
-    <button class="link-btn" id="btn-menu">&larr; levels</button>
+    <button class="link-btn" id="btn-menu">&larr; index</button>
     <span class="level-no" id="hud-no">01</span>
     <span class="level-name" id="hud-name"></span>
     <span class="spacer"></span>
-    <span class="tick" id="hud-tick">t 0</span>
+    <span class="tick" id="hud-tick">T 0000</span>
   </header>
 
   <p class="premise" id="premise"></p>
 
   <div class="stage-wrap">
-    <svg class="stage" id="stage" viewBox="0 0 900 500" role="img"
-         aria-label="the competition"></svg>
+    <svg class="stage" id="stage" viewBox="0 0 900 570" role="img"
+         aria-label="the apparatus"></svg>
   </div>
 
   <p class="goal" id="goal"></p>
@@ -49,13 +49,13 @@
 <!-- ------------------------------------------------------------- solved -->
 <div class="curtain" id="curtain" hidden>
   <div class="card">
-    <svg class="card-blob" viewBox="0 0 300 160" aria-hidden="true"></svg>
-    <p class="eyebrow">level <span id="done-no">1</span> cleared</p>
+    <svg class="card-blob" viewBox="0 0 440 240" aria-hidden="true"></svg>
+    <p class="eyebrow">exercise <span id="done-no">1</span> complete</p>
     <h2 id="done-title"></h2>
     <p class="lesson" id="done-lesson"></p>
     <div class="card-actions">
-      <button id="btn-again" class="link-btn">play again</button>
-      <button id="btn-next" class="big">next &rarr;</button>
+      <button id="btn-again" class="link-btn">run it again</button>
+      <button id="btn-next" class="big">proceed</button>
     </div>
   </div>
 </div>
