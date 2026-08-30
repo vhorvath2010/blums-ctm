@@ -13,7 +13,8 @@ parameter.
 [paper]: https://www.pnas.org/doi/10.1073/pnas.2115934119
 
 ```
-python -m ctm.viz         # visual console in your browser  <-- start here
+python -m ctm.game        # the game, six levels        <-- start here
+python -m ctm.viz         # the full console, every knob at once
 python -m ctm             # text shell
 python -m ctm demos       # run every experiment
 python -m pytest tests    # check the implementation against the paper
@@ -56,7 +57,38 @@ only thing choosing what the machine thinks about next is a tree of coin flips.
 | 1.6 Predictive dynamics, Sleeping Experts | `ctm/sleeping_experts.py` |
 | Chapter 3 phenomena | `ctm/demos.py` |
 
+## The game
+
+`python -m ctm.game` is a six-level introduction. Each level isolates one idea,
+gives you one or two things to touch, and states a goal you have to actually
+reach. The model underneath is the same CTM the tests exercise.
+
+```
+01  ONE STAGE            only one thing can be conscious at a time
+02  A WEIGHTED COIN      each chunk's share of the stage, in proportion
+03  THE CLIMB            becoming conscious takes h + 1 ticks
+04  THE BACK DOOR        blindsight
+05  IN PLAIN SIGHT       inattentional blindness
+06  BEFORE YOU FEEL IT   the delay behind free will
+```
+
+Chunks are drawn as torn-paper blobs sized by volume, and exactly one of them is
+on the stage at any moment. Level 4 is the one to play if you only play one: you
+have an eye that works, an obstacle in front of you, and two switches. Quieting
+the eye does not blind it — the percept still reaches the body through the link
+and still steers it. What is missing is the broadcast, and the broadcast is all
+inner speech can report, so it steers around an obstacle it truthfully says it
+never saw.
+
+Levels are won, not watched: level 4 will not accept an early result, because a
+chunk needs h + 1 ticks to reach the stage and evidence collected before then
+proves nothing.
+
 ## Watching it think
+
+For the full instrument — every processor, every knob, the live Up-Tree —
+`python -m ctm.viz` is still there. It shows everything at once, which is either
+what you want or exactly why you want the game instead.
 
 `python -m ctm.viz` starts a server on 127.0.0.1:8765 and opens a console.
 Nothing is reimplemented for the browser: every frame is a snapshot of the same
@@ -196,4 +228,6 @@ ctm/cli.py               the text shell
 ctm/viz/session.py       one live machine, flattened to JSON
 ctm/viz/server.py        stdlib HTTP server, binds 127.0.0.1 only
 ctm/viz/static/          the console (no build step, no framework)
+ctm/game/levels.py       six levels: setup, goal, and how it is won
+ctm/game/static/         the game (no build step, no framework)
 ```

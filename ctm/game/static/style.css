@@ -1,0 +1,277 @@
+/* Torn paper on a warm ground: cobalt, vermilion, ochre and ink, nothing else.
+   No cards, no borders, no boxes -- shapes and whitespace do the work. */
+
+:root {
+  --paper:  #EDEAE3;
+  --paper-2:#E4E0D7;
+  --ink:    #1B1815;
+  --ink-2:  #55504A;
+  --faint:  #8C857B;
+
+  --blue:   #4A6FB5;
+  --red:    #BE3A25;
+  --yellow: #EFC034;
+  --green:  #5E8C61;
+
+  --measure: 34rem;
+}
+
+/* The reference is a painted, single-world design; it commits to paper rather
+   than following the viewer's theme.  Everything is painted explicitly so it
+   holds on any host background. */
+
+* { box-sizing: border-box; }
+
+/* A class that sets `display` outranks the UA rule behind the hidden attribute,
+   so screens marked hidden would otherwise stay on screen and stack. */
+[hidden] { display: none !important; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 17px/1.6 Bitter, Georgia, "Times New Roman", serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2 { margin: 0; font-weight: 400; text-wrap: balance; }
+
+button {
+  font-family: Bitter, Georgia, serif;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+button:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+
+hr {
+  border: none;
+  border-top: 1.5px solid var(--ink);
+  width: min(28rem, 70vw);
+  margin: 2.2rem auto;
+}
+
+.screen {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1.5rem 4rem;
+}
+
+/* ------------------------------------------------------------- title */
+
+.title-screen { justify-content: center; text-align: center; }
+
+.logo { position: relative; display: inline-block; padding: 1.5rem 2.5rem; }
+.logo-blobs {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  z-index: 0; overflow: visible;
+}
+.logo h1 {
+  position: relative; z-index: 1;
+  font-family: "Caveat Brush", Bitter, cursive;
+  font-size: clamp(3.2rem, 9vw, 6rem);
+  line-height: .92;
+  letter-spacing: .01em;
+}
+
+.byline {
+  margin: 1.4rem 0 0; font-style: italic; color: var(--ink-2);
+  font-size: 1.05rem;
+}
+.footnote { margin: 3rem 0 0; color: var(--faint); font-size: .85rem; }
+
+.menu { display: flex; flex-direction: column; gap: .1rem; align-items: center; }
+
+.menu-item {
+  position: relative;
+  font-size: clamp(1.3rem, 3.4vw, 1.9rem);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: .5rem 1.6rem;
+  color: var(--ink);
+  transition: transform .14s ease;
+}
+.menu-item .swatch {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%) rotate(var(--tilt, -2deg));
+  width: 108%; height: 82%;
+  z-index: -1; opacity: 0;
+  transition: opacity .14s ease;
+}
+.menu-item:hover, .menu-item:focus-visible { transform: translateY(-1px); }
+.menu-item:hover .swatch, .menu-item:focus-visible .swatch { opacity: 1; }
+.menu-item .no {
+  font-size: .62em; color: var(--faint); margin-right: .7rem;
+  font-variant-numeric: tabular-nums;
+}
+.menu-item.done .no { color: var(--green); }
+.menu-item.done .no::after { content: " ✓"; }
+
+/* -------------------------------------------------------------- play */
+
+.play-screen { padding-top: 1.4rem; }
+
+.hud {
+  width: 100%; max-width: 62rem;
+  display: flex; align-items: baseline; gap: .9rem;
+  padding-bottom: .9rem; margin-bottom: 1.6rem;
+  border-bottom: 1.5px solid var(--ink);
+}
+.spacer { flex: 1; }
+.link-btn {
+  font-size: .9rem; color: var(--ink-2); text-decoration: underline;
+  text-underline-offset: 3px; padding: 0;
+}
+.link-btn:hover { color: var(--ink); }
+.level-no {
+  font-family: "Caveat Brush", cursive; font-size: 1.6rem; line-height: 1;
+}
+.level-name { text-transform: uppercase; letter-spacing: .07em; font-size: .95rem; }
+.tick {
+  font-size: .9rem; color: var(--faint); font-variant-numeric: tabular-nums;
+}
+
+.premise, .goal {
+  max-width: var(--measure); text-align: center; margin: 0 auto;
+}
+.premise { color: var(--ink-2); font-size: 1.02rem; }
+.goal {
+  margin-top: 1.6rem; font-weight: 600; font-size: 1.08rem;
+}
+.goal::before { content: "→ "; color: var(--red); }
+
+.stage-wrap { width: 100%; max-width: 62rem; margin: 1.2rem 0 .4rem; }
+.stage { width: 100%; height: auto; display: block; overflow: visible; }
+
+.stage .blob-label {
+  font-family: "Caveat Brush", cursive;
+  fill: var(--paper);
+  text-anchor: middle;
+  pointer-events: none;
+}
+.stage .blob-label.dark { fill: var(--ink); }
+.stage .caption {
+  font-family: Bitter, serif; font-size: 13px; fill: var(--faint);
+  text-anchor: middle;
+}
+.stage .clickable { cursor: pointer; }
+.stage .clickable:hover { opacity: .82; }
+.stage .rule { stroke: var(--ink); stroke-width: 1.5; }
+.stage .rule.faint { stroke: var(--faint); stroke-dasharray: 3 5; stroke-width: 1; }
+
+/* --------------------------------------------------------- controls */
+
+.controls {
+  display: flex; flex-wrap: wrap; gap: .8rem 1.4rem;
+  justify-content: center; align-items: center;
+  margin-top: 1.4rem;
+}
+
+.big {
+  position: relative;
+  font-size: 1.25rem; text-transform: uppercase; letter-spacing: .05em;
+  padding: .6rem 1.8rem;
+}
+.big .swatch {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%) rotate(-1.5deg);
+  width: 106%; height: 88%; z-index: -1;
+}
+.big:hover { transform: translateY(-1px); }
+
+.switch {
+  display: inline-flex; align-items: center; gap: .6rem;
+  font-size: 1rem; cursor: pointer;
+}
+.switch .box {
+  width: 1.5rem; height: 1.5rem; flex: none;
+  border: 1.5px solid var(--ink); border-radius: 2px;
+  display: grid; place-items: center;
+}
+.switch.on .box { background: var(--ink); }
+.switch .box svg { width: 1rem; height: 1rem; display: none; }
+.switch.on .box svg { display: block; }
+
+.guess { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+.guess .label { font-size: .95rem; color: var(--ink-2); }
+.guess button {
+  font-size: 1.1rem; padding: .35rem .9rem;
+  border: 1.5px solid var(--ink); border-radius: 2px;
+  font-variant-numeric: tabular-nums;
+}
+.guess button.picked { background: var(--ink); color: var(--paper); }
+
+/* --------------------------------------------------------- progress */
+
+.progress {
+  display: flex; gap: .4rem; align-items: center; justify-content: center;
+  margin-top: 1rem; font-size: .9rem; color: var(--ink-2);
+}
+.pips { display: flex; gap: .28rem; }
+.pip {
+  width: .55rem; height: .55rem; border-radius: 50%;
+  border: 1.5px solid var(--ink-2);
+}
+.pip.on { background: var(--ink); border-color: var(--ink); }
+
+.readout {
+  margin-top: 1.4rem; max-width: var(--measure); width: 100%;
+  font-size: .95rem; color: var(--ink-2);
+}
+.readout table { width: 100%; border-collapse: collapse; }
+.readout td {
+  padding: .3rem 0; font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid var(--paper-2);
+}
+.readout td.r { text-align: right; }
+.readout .strong { color: var(--ink); font-weight: 600; }
+.readout .bar { height: .5rem; border-radius: 1px; display: block; }
+.readout .say {
+  font-style: italic; color: var(--ink); text-align: center;
+  font-size: 1.05rem; margin: .2rem 0 0;
+}
+
+/* ---------------------------------------------------------- curtain */
+
+.curtain {
+  position: fixed; inset: 0; z-index: 40;
+  /* Opaque: at 88% the game showed through and collided with the card. */
+  background: var(--paper);
+  display: grid; place-items: center; padding: 2rem;
+  animation: fade .25s ease;
+}
+@keyframes fade { from { opacity: 0; } }
+
+.card {
+  position: relative; max-width: 32rem; text-align: center;
+  padding: 2rem 1rem;
+}
+.card-blob {
+  position: absolute; top: 1.4rem; left: 50%;
+  transform: translateX(-50%); width: 16rem; height: 8rem;
+  z-index: -1; overflow: visible;
+}
+.eyebrow {
+  margin: 0 0 .4rem; text-transform: uppercase; letter-spacing: .12em;
+  font-size: .78rem; color: var(--ink-2);
+}
+.card h2 { font-family: "Caveat Brush", cursive; font-size: 2.6rem; line-height: 1; }
+.lesson { margin: 1.2rem 0 0; color: var(--ink-2); }
+.card-actions {
+  margin-top: 2rem; display: flex; gap: 1.6rem;
+  align-items: center; justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  .hud { flex-wrap: wrap; }
+}

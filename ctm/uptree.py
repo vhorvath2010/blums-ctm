@@ -122,6 +122,18 @@ class UpTree:
             return [0.0] * len(chunks)
         return [v / total for v in values]
 
+    def flush(self) -> None:
+        """Empty every level back to silence.
+
+        The tree is pipelined, so at any moment it holds h competitions that
+        were submitted under whatever conditions applied when they started.
+        After changing the setup those are stale: they will keep arriving in STM
+        for h more ticks and would be read as results of the new setup.
+        """
+        for s in range(self.h + 1):
+            self.levels[s] = [Chunk.silent() for _ in range(self.width >> s)]
+            self.choice[s] = [0 for _ in range(self.width >> s)]
+
     def snapshot(self) -> list[list[dict]]:
         """Every node of the tree as plain data, for a visualiser.
 

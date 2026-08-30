@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Machine That Notices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Bitter:ital,wght@0,400;0,600;0,700;1,400&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<!-- ------------------------------------------------------------- title -->
+<section class="screen title-screen" id="screen-title">
+  <div class="logo">
+    <svg class="logo-blobs" viewBox="0 0 640 300" aria-hidden="true"></svg>
+    <h1>A Machine<br>That Notices</h1>
+  </div>
+  <p class="byline">the Conscious Turing Machine, in six levels</p>
+  <hr>
+  <nav class="menu" id="menu"></nav>
+  <p class="footnote">after Lenore &amp; Manuel Blum, PNAS 2022</p>
+</section>
+
+<!-- -------------------------------------------------------------- play -->
+<section class="screen play-screen" id="screen-play" hidden>
+  <header class="hud">
+    <button class="link-btn" id="btn-menu">&larr; levels</button>
+    <span class="level-no" id="hud-no">01</span>
+    <span class="level-name" id="hud-name"></span>
+    <span class="spacer"></span>
+    <span class="tick" id="hud-tick">t 0</span>
+  </header>
+
+  <p class="premise" id="premise"></p>
+
+  <div class="stage-wrap">
+    <svg class="stage" id="stage" viewBox="0 0 900 500" role="img"
+         aria-label="the competition"></svg>
+  </div>
+
+  <p class="goal" id="goal"></p>
+  <div class="progress" id="progress"></div>
+  <div class="controls" id="controls"></div>
+  <div class="readout" id="readout"></div>
+</section>
+
+<!-- ------------------------------------------------------------- solved -->
+<div class="curtain" id="curtain" hidden>
+  <div class="card">
+    <svg class="card-blob" viewBox="0 0 300 160" aria-hidden="true"></svg>
+    <p class="eyebrow">level <span id="done-no">1</span> cleared</p>
+    <h2 id="done-title"></h2>
+    <p class="lesson" id="done-lesson"></p>
+    <div class="card-actions">
+      <button id="btn-again" class="link-btn">play again</button>
+      <button id="btn-next" class="big">next &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>
