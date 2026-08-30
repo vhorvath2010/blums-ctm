@@ -125,15 +125,20 @@ class Level:
 class L1(Level):
     number = 1
     title = "One stage"
-    subtitle = "Short Term Memory holds exactly one thing"
-    premise = ("Three processors are talking at once. Only one of them can be "
-               "conscious. Louder is likelier — strike a valve to run its "
-               "filament hotter.")
-    goal = "Get HUNGER onto the stage three times."
-    lesson = ("There is no chooser. Nothing decided that hunger mattered — it "
-              "simply arrived loudest at a coin flip. Consciousness in the CTM "
-              "is a bottleneck, not a decision.")
-    controls = [{"kind": "blobs", "label": "Strike a valve to raise its filament"}]
+    subtitle = "Short Term Memory holds one thing"
+    premise = ("Three processors each have something to say. Short Term Memory "
+               "holds one chunk at a time, so on every tick the three compete "
+               "and one wins. A processor that puts more weight behind its "
+               "chunk gets better odds. Click one to raise its weight.")
+    goal = "Get HUNGER into Short Term Memory three times."
+    lesson = ("Nothing chose hunger. There is no manager inside the machine "
+              "deciding what matters. Hunger won because you gave it more "
+              "weight and the draw went its way. Blum and Blum argue this "
+              "narrow channel is the point of consciousness: everything the "
+              "machine knows has to compete for one slot, which is what lets "
+              "the whole machine work on one thing at a time.")
+    controls = [{"kind": "blobs",
+                 "label": "Click a processor to raise its weight"}]
 
     def build(self):
         self.voices = [
@@ -159,19 +164,24 @@ class L1(Level):
             self.solved = True
 
     def extra(self):
-        return {"counter": {"label": "hunger on stage", "value": self.wins, "of": 3}}
+        return {"counter": {"label": "hunger in short term memory",
+                            "value": self.wins, "of": 3}}
 
 
 class L2(Level):
     number = 2
     title = "A weighted coin"
-    subtitle = "Every chunk gets a share of the stage, in proportion"
-    premise = ("Four processors, fixed volumes: 1, 2, 3 and 4. Run the "
-               "competition again and again and count who wins.")
-    goal = "Run 60 rounds and compare what happened to what was predicted."
-    lesson = ("The tally converges on each blob's share of the total volume. "
-              "This is the paper's theorem: a chunk's time on stage is exactly "
-              "proportional to its f-value. The machine is fair, not fastest.")
+    subtitle = "Each chunk's share of Short Term Memory"
+    premise = ("Four processors submit chunks every tick, with weights fixed "
+               "at 1, 2, 3 and 4. Run the machine and keep score of which one "
+               "reaches Short Term Memory. The table fills in as you go.")
+    goal = "Run 60 ticks, then compare the score to the prediction."
+    lesson = ("Each processor wins about as often as its share of the total "
+              "weight. The one at 4 out of 10 takes roughly 40% of the ticks. "
+              "Blum and Blum prove this holds exactly. It also means no "
+              "processor is ever shut out for good: a low-weight one still "
+              "gets its turn, just rarely, so the machine never goes "
+              "permanently deaf to anything.")
     controls = [{"kind": "run", "label": "Run 20 rounds", "value": 20}]
     autoplay = False
 
@@ -207,25 +217,29 @@ class L2(Level):
                  "predicted": round(v.base_weight / total, 3)}
                 for v in self.voices
             ],
-            "counter": {"label": "rounds", "value": self.rounds, "of": 60},
+            "counter": {"label": "ticks scored", "value": self.rounds, "of": 60},
         }
 
 
 class L3(Level):
     number = 3
     title = "The climb"
-    subtitle = "Becoming conscious takes time"
-    premise = ("Sixteen processors sit at the leaves of a tree. A chunk has to "
-               "win its way up, one level per tick, before it reaches the stage. "
-               "Shout, then count the ticks.")
-    goal = "Shout, then guess how many ticks until you hear yourself."
-    lesson = ("Height h = 4, so a chunk submitted at t is on stage at t + 4 and "
-              "consciously received at t + 5. Scale that to 10 million "
-              "processors at 10 ticks a second and you get the paper's ~2.4 "
-              "seconds — about how long people take to notice their own "
-              "decisions.")
+    subtitle = "Why becoming conscious takes time"
+    premise = ("Sixteen processors submit at once. Their chunks meet in pairs, "
+               "and each pair sends one winner up to the next level. Blum and "
+               "Blum call this the Up-Tree, and every level of it costs one "
+               "tick. Press SHOUT to submit a very heavy chunk and follow it "
+               "up.")
+    goal = "Shout, then say how many ticks passed before it was broadcast."
+    lesson = ("This Up-Tree is four levels deep, so a chunk needs four ticks "
+              "to reach Short Term Memory and one more to be broadcast back "
+              "to every processor. Five ticks in total. A brain would have "
+              "millions of processors and a far deeper tree. Blum and Blum "
+              "work that case out to roughly 2.4 seconds, which is close to "
+              "how long people take to report a decision they have already "
+              "made.")
     controls = [{"kind": "shout", "label": "SHOUT"},
-                {"kind": "guess", "label": "ticks until conscious",
+                {"kind": "guess", "label": "ticks until broadcast",
                  "options": [1, 3, 5, 7]}]
 
     def build(self):
@@ -273,17 +287,23 @@ class L4(Level):
     number = 4
     title = "The back door"
     subtitle = "Blindsight"
-    premise = ("An obstacle is in front of the machine. Its eye works. But a "
-               "processor can also whisper straight to the body through a link, "
-               "skipping the stage entirely.")
+    premise = ("The machine has a vision processor, and there is an obstacle "
+               "in front of it. You can change two things: how much weight "
+               "vision puts behind its chunks, and whether vision has a link "
+               "straight to the motor processor. Chunks sent along a link "
+               "never enter the competition at all.")
     goal = "Make it avoid the obstacle while it truthfully reports seeing nothing."
-    lesson = ("Nothing is wrong with the eye. Quiet is not blind — the percept "
-              "still reaches the body down the link and still steers it. What is "
-              "missing is the broadcast, and the broadcast is the only thing "
-              "inner speech can report. That gap is blindsight.")
+    lesson = ("You did not damage vision. You lowered its weight until it "
+              "stopped winning the competition, so nothing it saw was ever "
+              "broadcast. The link carried the same information straight to "
+              "the motor processor, which acted on it. A processor can only "
+              "report what was broadcast, so the machine reports seeing "
+              "nothing, and it is being honest. People with damage to the "
+              "visual cortex do exactly this. They report no vision, then "
+              "reach for objects accurately. Doctors call it blindsight.")
     controls = [
-        {"kind": "toggle", "id": "loud", "label": "Eye is loud", "on": True},
-        {"kind": "toggle", "id": "link", "label": "Link eye → body", "on": False},
+        {"kind": "toggle", "id": "loud", "label": "Vision at full weight", "on": True},
+        {"kind": "toggle", "id": "link", "label": "Link vision → motor", "on": False},
     ]
 
     def build(self):
@@ -349,15 +369,19 @@ class L5(Level):
     number = 5
     title = "In plain sight"
     subtitle = "Inattentional blindness"
-    premise = ("A gorilla walks through. The eye is working perfectly and set "
-               "loud. But a counting task is shouting at volume 30 and the "
-               "gorilla only manages 6.")
-    goal = "Let the counting run until the gorilla is missed — then stop it and look again."
-    lesson = ("Nothing was broken and nothing was hidden. The gorilla lost a "
-              "series of coin flips to something louder. Attention here is not a "
-              "spotlight being pointed anywhere; it is whatever survived the "
-              "competition.")
-    controls = [{"kind": "toggle", "id": "count", "label": "Counting task", "on": True}]
+    premise = ("A gorilla is in plain view and the vision processor is "
+               "working normally, submitting at weight 6. A counting task is "
+               "running as well, submitting at weight 30. Vision has to beat "
+               "that to be broadcast.")
+    goal = "See how often the gorilla gets through, then switch the counting off."
+    lesson = ("The gorilla stood in front of a working vision processor the "
+              "whole time. Its chunks lost the competition to a heavier one, "
+              "tick after tick. In the study this comes from, about half the "
+              "people counting basketball passes never notice someone in a "
+              "gorilla suit walk through the shot. Nothing was aimed away "
+              "from the gorilla. It was simply outbid.")
+    controls = [{"kind": "toggle", "id": "count",
+                 "label": "Counting task running", "on": True}]
 
     def build(self):
         self.world = World()
@@ -402,10 +426,10 @@ class L5(Level):
             "watched": self.watched,
             "got_through": self.got_through,
             "seen_after": self.seen_after,
-            "counter": ({"label": "ticks watched while counting",
+            "counter": ({"label": "ticks with the counting task on",
                          "value": self.watched, "of": 20}
                         if self.phase == "miss" else
-                        {"label": "sightings with counting off",
+                        {"label": "broadcasts with counting off",
                          "value": self.seen_after, "of": 3}),
         }
 
@@ -414,14 +438,19 @@ class L6(Level):
     number = 6
     title = "Before you feel it"
     subtitle = "The delay behind free will"
-    premise = ("A hand rests on a hot stove. The pain has a link straight to the "
-               "body, and it also has to climb the tree like everything else.")
-    goal = "Touch the stove, and watch the hand move before the pain is felt."
-    lesson = ("The withdrawal fired the tick the pain arrived. The feeling "
-              "needed five more ticks to climb the tree. By the time it feels "
-              "like a decision, the hand has been moving for half a second — and "
-              "the self-model, which only hears the broadcast, records that it "
-              "acted without any record of why.")
+    premise = ("A hand is resting on a hot stove. The pain processor has a "
+               "link straight to the motor processor, and it also submits "
+               "chunks to the competition like everything else. The link "
+               "takes one tick. The competition takes five.")
+    goal = "Touch the stove, and watch the hand move before the pain is broadcast."
+    lesson = ("The hand pulled away on the tick the pain arrived, over the "
+              "link. The pain itself needed five more ticks to win the "
+              "competition and be broadcast. By the time the machine is "
+              "conscious of the pain it has already moved, and it holds no "
+              "record of having decided, because the decision never went "
+              "through the broadcast. Experiments on people find something "
+              "similar: brain activity predicting a movement often appears "
+              "before the person reports choosing to move.")
     controls = [{"kind": "stove", "label": "TOUCH THE STOVE"}]
 
     def build(self):

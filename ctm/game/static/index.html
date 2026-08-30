@@ -17,49 +17,68 @@
     <svg class="logo-blobs" viewBox="0 0 760 340" aria-hidden="true"></svg>
     <h1>Apparatus of<em>Attention</em></h1>
   </div>
-  <p class="byline">a conscious turing machine, in six exercises</p>
+  <p class="byline">A machine that notices things, taken apart in six steps.</p>
   <div class="plate-rule"></div>
   <nav class="menu" id="menu"></nav>
-  <p class="footnote">after Lenore &amp; Manuel Blum, PNAS 2022</p>
+  <p class="footnote">
+    Built on the Conscious Turing Machine of Lenore and Manuel Blum (PNAS, 2022).
+    <button class="link-btn" id="btn-glossary">Read the index &rarr;</button>
+  </p>
 </section>
 
 <!-- -------------------------------------------------------------- play -->
 <section class="screen play-screen" id="screen-play" hidden>
-  <header class="hud">
-    <button class="link-btn" id="btn-menu">&larr; index</button>
+  <header class="hud" id="hud-panel">
+    <button class="link-btn" id="btn-menu">&larr; back</button>
     <span class="level-no" id="hud-no">01</span>
     <span class="level-name" id="hud-name"></span>
     <span class="spacer"></span>
+    <button class="link-btn" id="btn-glossary-2">index</button>
     <span class="tick" id="hud-tick">T 0000</span>
   </header>
 
   <p class="premise" id="premise"></p>
 
   <div class="stage-wrap">
-    <svg class="stage" id="stage" viewBox="0 0 900 570" role="img"
+    <svg class="stage" id="stage" viewBox="0 0 900 480" role="img"
          aria-label="the apparatus"></svg>
   </div>
 
   <p class="goal" id="goal"></p>
   <div class="progress" id="progress"></div>
   <div class="controls" id="controls"></div>
-  <div class="readout" id="readout"></div>
+  <div class="readout" id="readout-panel"><div class="readout-body" id="readout"></div></div>
 </section>
 
-<!-- ------------------------------------------------------------- solved -->
+<!-- ------------------------------------------------------------- index -->
+<section class="screen index-screen" id="screen-index" hidden>
+  <header class="index-head">
+    <button class="link-btn" id="btn-index-back">&larr; back</button>
+    <h2>Index</h2>
+  </header>
+  <p class="index-intro">
+    Every term this game uses, in plain words. While you play you can hover any
+    highlighted word to see the same thing without leaving the level.
+  </p>
+  <dl class="index-list" id="index-list"></dl>
+</section>
+
+<!-- ------------------------------------------------------------ solved -->
 <div class="curtain" id="curtain" hidden>
   <div class="card">
     <svg class="card-blob" viewBox="0 0 440 240" aria-hidden="true"></svg>
-    <p class="eyebrow">exercise <span id="done-no">1</span> complete</p>
+    <p class="eyebrow">step <span id="done-no">1</span> done</p>
     <h2 id="done-title"></h2>
     <p class="lesson" id="done-lesson"></p>
     <div class="card-actions">
       <button id="btn-again" class="link-btn">run it again</button>
-      <button id="btn-next" class="big">proceed</button>
+      <button id="btn-next" class="big"><span class="cap">next step</span></button>
     </div>
   </div>
 </div>
 
-<script src="/app.js"></script>
+<div class="tip" id="tip" hidden></div>
+
+<script type="module" src="/app.js"></script>
 </body>
 </html>

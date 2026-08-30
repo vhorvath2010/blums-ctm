@@ -1,36 +1,25 @@
-/* An apparatus, not a poster.
+/* Layout and type only.
  *
- * The machine is imagined as institutional valve-computing hardware: enamelled
- * steel, stencilled plates, one amber phosphor aperture where the conscious
- * chunk is lit. Colour is oxidised and muddy -- ochre, verdigris, oxide red,
- * cold slate -- with amber reserved almost entirely for what is conscious, so
- * the eye reads the stage before it reads anything else.
+ * Every surface -- plates, keys, switches, the rack -- is painted in SVG by
+ * paint.js and dropped in behind the text as `.paint-bg`. This file positions
+ * things and sets the lettering; it deliberately declares no gradients and no
+ * borders on anything that has paint of its own, so the two never disagree.
  *
- * Everything is painted rather than drawn: shapes take a turbulence
- * displacement so their edges scumble, and a grain layer sits over the page.
- * Single-world by intent -- there is no light variant, and every colour is
- * stated explicitly so it holds on any host background.
+ * Single world by intent: there is no light variant, and every colour is stated
+ * outright so the page holds on any host background.
  */
 
 :root {
-  --void:    #14181A;   /* behind everything */
-  --steel:   #222B2D;   /* the chassis */
-  --steel-2: #2C3739;   /* raised plate */
-  --steel-3: #384446;   /* bezel highlight */
-  --seam:    #101416;   /* recessed seam */
-
-  --enamel:  #C9BFA6;   /* stencilled paint */
-  --enamel-2:#8E8875;   /* worn stencil */
-  --faint:   #5E655F;
-
-  --amber:   #E9A93C;   /* phosphor: conscious content */
+  --void:    #14181A;
+  --enamel:  #C9BFA6;   /* stencilled lettering */
+  --enamel-2:#948D79;
+  --faint:   #626A63;
+  --amber:   #E9A93C;
   --amber-hi:#F7D08A;
-  --verdi:   #4E8177;   /* oxidised copper */
-  --oxide:   #9A4232;   /* oxide red */
-  --moss:    #77854A;   /* signal green */
-  --slate:   #55697A;   /* cold slate: the crowd */
+  --measure: 34rem;
 
-  --measure: 36rem;
+  --stencil: "Saira Condensed", "Arial Narrow", sans-serif;
+  --meter:   "Share Tech Mono", ui-monospace, monospace;
 }
 
 * { box-sizing: border-box; }
@@ -46,20 +35,30 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Canvas tooth over the whole page. */
+/* Canvas tooth over everything. */
 body::after {
   content: "";
   position: fixed; inset: 0; z-index: 100; pointer-events: none;
-  opacity: .15;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+  opacity: .14; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='.5'/%3E%3C/svg%3E");
 }
 
 h1, h2 { margin: 0; font-weight: 600; text-wrap: balance; }
-
 button { font-family: inherit; cursor: pointer; border: none; background: none;
-         color: inherit; }
+         color: inherit; padding: 0; }
 button:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+
+/* Painted backdrops sit behind their element's own content. */
+.paint-bg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+}
+.menu-item, .big, .hud, .readout, .guess button, .switch .box, .index-head {
+  position: relative; background: none; border: none;
+}
+.menu-item > :not(.paint-bg), .big > :not(.paint-bg),
+.hud > :not(.paint-bg), .readout > :not(.paint-bg),
+.guess button > :not(.paint-bg) { position: relative; z-index: 1; }
 
 .screen {
   min-height: 100%;
@@ -78,67 +77,54 @@ button:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
 }
 .logo h1 {
   position: relative;
-  font-family: "Saira Condensed", "Arial Narrow", sans-serif;
-  font-weight: 700; text-transform: uppercase;
-  font-size: clamp(2.3rem, 7vw, 4.4rem);
-  line-height: .98; letter-spacing: .045em;
-  color: var(--enamel);
-  text-shadow: 0 2px 0 rgba(0, 0, 0, .5);
+  font-family: var(--stencil); font-weight: 700; text-transform: uppercase;
+  font-size: clamp(2.3rem, 7vw, 4.4rem); line-height: .98; letter-spacing: .045em;
+  color: var(--enamel); text-shadow: 0 2px 0 rgba(0, 0, 0, .5);
 }
 .logo h1 em {
   display: block; font-style: normal; color: var(--amber);
   text-shadow: 0 0 26px rgba(233, 169, 60, .4), 0 2px 0 rgba(0, 0, 0, .55);
 }
 
-.byline {
-  margin: 1.7rem 0 0; color: var(--enamel-2); font-style: italic;
-  font-size: 1.02rem;
+.byline { margin: 1.7rem 0 0; color: var(--enamel-2); font-size: 1.05rem; }
+.footnote {
+  margin: 3rem 0 0; color: var(--faint); font-size: .84rem;
+  max-width: 30rem; line-height: 1.7;
 }
-.footnote { margin: 3.2rem 0 0; color: var(--faint); font-size: .82rem; }
 
 .plate-rule {
-  width: min(30rem, 76vw); height: 3px; margin: 2.4rem auto;
-  background: linear-gradient(90deg, transparent, var(--steel-3) 12%,
-              var(--steel-3) 88%, transparent);
-  border-top: 1px solid rgba(0, 0, 0, .5);
+  width: min(30rem, 76vw); height: 2px; margin: 2.3rem auto;
+  background: linear-gradient(90deg, transparent, #3B4749 14%, #3B4749 86%,
+                              transparent);
 }
 
-.menu { display: flex; flex-direction: column; gap: .45rem;
+.menu { display: flex; flex-direction: column; gap: .5rem;
         width: min(36rem, 92vw); }
 
 .menu-item {
   display: flex; align-items: center; gap: .95rem;
-  padding: .72rem 1.05rem;
-  background: linear-gradient(180deg, var(--steel-2), var(--steel));
-  border: 1px solid var(--seam); border-top-color: var(--steel-3);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .04);
-  color: var(--enamel); text-align: left;
-  transition: transform .12s ease, filter .12s ease;
+  padding: .8rem 1.15rem; color: var(--enamel); text-align: left;
+  transition: transform .12s ease;
 }
-.menu-item:hover { transform: translateX(2px); filter: brightness(1.12); }
+.menu-item:hover { transform: translateX(2px); }
 .menu-item:hover .plaque { color: var(--amber-hi); }
-.menu-item .no {
-  font-family: "Share Tech Mono", monospace; font-size: 1.02rem;
-  color: var(--enamel-2); flex: none;
-}
+.menu-item .no { font-family: var(--meter); font-size: 1rem;
+                 color: var(--enamel-2); flex: none; }
 .menu-item .plaque {
-  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
-  letter-spacing: .12em; font-weight: 600; font-size: 1.04rem;
-  white-space: nowrap;
+  font-family: var(--stencil); text-transform: uppercase; letter-spacing: .12em;
+  font-weight: 600; font-size: 1.04rem; white-space: nowrap;
 }
 .menu-item .sub {
-  margin-left: auto; text-align: right;
-  font-size: .78rem; color: var(--faint); font-style: italic;
+  margin-left: auto; text-align: right; font-size: .82rem; color: var(--faint);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-/* Indicator lamp: dark until the level is cleared. */
 .menu-item .lamp {
-  width: .6rem; height: .6rem; border-radius: 50%; flex: none;
-  background: #1A2022; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .6);
+  width: .6rem; height: .6rem; border-radius: 50%; flex: none; z-index: 1;
+  background: #171D1F; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .7);
 }
 .menu-item.done .lamp {
   background: var(--amber);
-  box-shadow: 0 0 9px rgba(233, 169, 60, .85), inset 0 0 0 1px rgba(0, 0, 0, .4);
+  box-shadow: 0 0 10px rgba(233, 169, 60, .9), inset 0 0 0 1px rgba(0, 0, 0, .4);
 }
 
 /* -------------------------------------------------------------- play */
@@ -148,162 +134,182 @@ button:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
 .hud {
   width: 100%; max-width: 64rem;
   display: flex; align-items: center; gap: 1rem;
-  padding: .55rem .9rem; margin-bottom: 1.3rem;
-  background: linear-gradient(180deg, var(--steel-2), var(--steel));
-  border: 1px solid var(--seam); border-top-color: var(--steel-3);
+  padding: .7rem 1.1rem; margin-bottom: 1.4rem;
 }
 .spacer { flex: 1; }
 .link-btn {
-  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
-  letter-spacing: .1em; font-size: .78rem; color: var(--enamel-2);
+  font-family: var(--stencil); text-transform: uppercase; letter-spacing: .1em;
+  font-size: .78rem; color: var(--enamel-2);
 }
 .link-btn:hover { color: var(--amber); }
-.level-no {
-  font-family: "Share Tech Mono", monospace; font-size: 1.12rem; color: var(--amber);
-}
+.level-no { font-family: var(--meter); font-size: 1.12rem; color: var(--amber); }
 .level-name {
-  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
-  letter-spacing: .14em; font-size: .9rem; font-weight: 600;
+  font-family: var(--stencil); text-transform: uppercase; letter-spacing: .14em;
+  font-size: .9rem; font-weight: 600;
 }
 .tick {
-  font-family: "Share Tech Mono", monospace; font-size: .9rem;
-  color: var(--amber); text-shadow: 0 0 10px rgba(233, 169, 60, .45);
+  font-family: var(--meter); font-size: .9rem; color: var(--amber);
+  text-shadow: 0 0 10px rgba(233, 169, 60, .45);
 }
 
 .premise, .goal { max-width: var(--measure); text-align: center; margin: 0 auto; }
-.premise { color: var(--enamel-2); font-size: 1rem; }
+.premise { color: var(--enamel-2); font-size: 1.02rem; }
 .goal {
   margin-top: 1.5rem; font-size: 1rem; color: var(--enamel);
-  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
-  letter-spacing: .1em; font-weight: 600;
+  font-family: var(--stencil); text-transform: uppercase; letter-spacing: .09em;
+  font-weight: 600;
 }
-.goal::before {
-  content: "\25B6"; color: var(--amber); margin-right: .55rem; font-size: .78em;
-}
+.goal::before { content: "\25B6"; color: var(--amber); margin-right: .55rem;
+                font-size: .78em; }
 
 .stage-wrap { width: 100%; max-width: 64rem; margin: 2rem 0 .3rem; }
 .stage { width: 100%; height: auto; display: block; overflow: visible; }
 
-.stage .aperture-text {
-  font-family: "Share Tech Mono", monospace;
-  fill: var(--amber-hi); text-anchor: middle; pointer-events: none;
-}
+.stage .aperture-text { font-family: var(--meter); fill: var(--amber-hi);
+                        text-anchor: middle; pointer-events: none; }
 .stage .plate-text {
-  font-family: "Saira Condensed", sans-serif; font-weight: 600;
-  text-transform: uppercase; letter-spacing: .16em;
-  fill: var(--enamel-2); text-anchor: middle; font-size: 11px;
+  font-family: var(--stencil); font-weight: 600; text-transform: uppercase;
+  letter-spacing: .16em; fill: var(--enamel-2); text-anchor: middle;
 }
 .stage .valve-text {
-  font-family: "Saira Condensed", sans-serif; font-weight: 600;
-  text-transform: uppercase; letter-spacing: .05em;
-  fill: var(--enamel); text-anchor: middle;
+  font-family: var(--stencil); font-weight: 600; text-transform: uppercase;
+  letter-spacing: .05em; fill: var(--enamel); text-anchor: middle;
 }
-.stage .reading {
-  font-family: "Share Tech Mono", monospace; font-size: 11px;
-  fill: var(--enamel-2); text-anchor: middle;
-}
+.stage .reading { font-family: var(--meter); font-size: 11px;
+                  fill: var(--enamel-2); text-anchor: middle; }
 .stage .clickable { cursor: pointer; }
 .stage .clickable:hover { filter: brightness(1.3); }
 
 /* --------------------------------------------------------- controls */
 
 .controls {
-  display: flex; flex-wrap: wrap; gap: .9rem 1.5rem;
-  justify-content: center; align-items: center; margin-top: 1.4rem;
+  display: flex; flex-wrap: wrap; gap: 1rem 1.6rem;
+  justify-content: center; align-items: center; margin-top: 1.5rem;
 }
 .controls .note {
-  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
-  letter-spacing: .1em; font-size: .78rem; color: var(--enamel-2); margin: 0;
+  font-family: var(--stencil); text-transform: uppercase; letter-spacing: .1em;
+  font-size: .78rem; color: var(--enamel-2); margin: 0;
 }
 
-/* A push-button that stands proud of the chassis and depresses when struck. */
-.big {
-  font-family: "Saira Condensed", sans-serif; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .14em; font-size: 1rem;
-  padding: .76rem 2rem; color: #17110A;
-  background: linear-gradient(180deg, var(--amber-hi), var(--amber) 55%, #B87F23);
-  border: 1px solid #0E1214;
-  box-shadow: 0 4px 0 #6E4A15, 0 6px 14px rgba(0, 0, 0, .5);
-  transition: filter .12s ease;
+.big { padding: .85rem 2.1rem; transition: transform .1s ease; }
+.big .cap {
+  font-family: var(--stencil); font-weight: 700; text-transform: uppercase;
+  letter-spacing: .15em; font-size: 1rem; color: #1A1206;
+  text-shadow: 0 1px 0 rgba(255, 240, 200, .35);
 }
-.big:hover { filter: brightness(1.07); }
-.big:active { transform: translateY(3px); box-shadow: 0 1px 0 #6E4A15; }
+.big:hover { transform: translateY(-1px); }
+.big:active { transform: translateY(2px); }
 
-/* A toggle with a physical throw. */
-.switch { display: inline-flex; align-items: center; gap: .7rem; }
-.switch .box {
-  width: 2.5rem; height: 1.32rem; flex: none; position: relative;
-  background: var(--seam); border: 1px solid #0B0E10;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, .7);
+.switch { display: inline-flex; align-items: center; gap: .75rem; }
+.switch .box { width: 3rem; height: 1.7rem; flex: none; }
+/* The handle is painted; only its throw is CSS. */
+.switch .box .lever {
+  transform-origin: 50% 62%; transform: rotate(-26deg);
+  transition: transform .18s cubic-bezier(.3, 1.5, .5, 1);
 }
-.switch .box::after {
-  content: ""; position: absolute; top: 1px; left: 1px;
-  width: 1.02rem; height: calc(100% - 2px);
-  background: linear-gradient(180deg, var(--steel-3), var(--steel));
-  border: 1px solid #0B0E10;
-  transition: transform .16s cubic-bezier(.3, 1.4, .5, 1);
-}
-.switch.on .box { background: #3A2A10; }
-.switch.on .box::after {
-  transform: translateX(1.3rem);
-  background: linear-gradient(180deg, var(--amber-hi), var(--amber));
-  box-shadow: 0 0 10px rgba(233, 169, 60, .6);
-}
+.switch.on .box .lever { transform: rotate(24deg); }
+.switch .box .lever-glow { transition: opacity .18s ease; }
+.switch.on .box .lever-glow { opacity: .5; }
 .switch .switch-label {
-  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
-  letter-spacing: .1em; font-size: .84rem; font-weight: 600;
+  font-family: var(--stencil); text-transform: uppercase; letter-spacing: .1em;
+  font-size: .84rem; font-weight: 600; color: var(--enamel-2);
 }
 .switch.on .switch-label { color: var(--amber-hi); }
 
-.guess { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+.guess { display: flex; gap: .55rem; align-items: center; flex-wrap: wrap; }
 .guess .label {
-  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
-  letter-spacing: .1em; font-size: .78rem; color: var(--enamel-2);
+  font-family: var(--stencil); text-transform: uppercase; letter-spacing: .1em;
+  font-size: .78rem; color: var(--enamel-2);
 }
-.guess button {
-  font-family: "Share Tech Mono", monospace; font-size: 1.02rem;
-  padding: .4rem 1rem; color: var(--enamel);
-  background: linear-gradient(180deg, var(--steel-2), var(--steel));
-  border: 1px solid var(--seam); border-top-color: var(--steel-3);
-}
-.guess button.picked {
-  background: linear-gradient(180deg, var(--amber-hi), var(--amber)); color: #17110A;
-}
+.guess button { padding: .45rem 1.05rem; }
+.guess button .cap { font-family: var(--meter); font-size: 1.02rem;
+                     color: var(--enamel); }
+.guess button.picked .cap { color: var(--amber-hi);
+                            text-shadow: 0 0 10px rgba(233, 169, 60, .6); }
 
 /* --------------------------------------------------------- progress */
 
 .progress {
   display: flex; gap: .5rem; align-items: center; justify-content: center;
-  margin-top: 1.05rem;
-  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
+  margin-top: 1.1rem; font-family: var(--stencil); text-transform: uppercase;
   letter-spacing: .11em; font-size: .76rem; color: var(--enamel-2);
 }
 .pips { display: flex; gap: .3rem; }
-.pip {
-  width: .5rem; height: .5rem; border-radius: 50%;
-  background: #171D1F; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .6);
-}
-.pip.on { background: var(--amber); box-shadow: 0 0 7px rgba(233, 169, 60, .75); }
+.pip { width: .5rem; height: .5rem; border-radius: 50%; background: #181E20;
+       box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .7); }
+.pip.on { background: var(--amber); box-shadow: 0 0 7px rgba(233, 169, 60, .8); }
 
 .readout {
-  margin-top: 1.4rem; max-width: var(--measure); width: 100%;
-  font-family: "Share Tech Mono", monospace; font-size: .86rem;
-  color: var(--enamel-2);
-  background: linear-gradient(180deg, #191F21, #141819);
-  border: 1px solid var(--seam); border-top-color: var(--steel-3);
-  padding: .85rem 1.1rem;
+  margin-top: 1.5rem; max-width: var(--measure); width: 100%;
+  padding: 1rem 1.25rem;
+  font-family: var(--meter); font-size: .86rem; color: var(--enamel-2);
 }
-.readout:empty { display: none; }
+.readout:has(.readout-body:empty) { display: none; }
 .readout table { width: 100%; border-collapse: collapse; }
-.readout td { padding: .28rem 0; border-bottom: 1px solid rgba(255, 255, 255, .05); }
+.readout td { padding: .3rem 0; border-bottom: 1px solid rgba(201, 191, 166, .07); }
 .readout tr:last-child td { border-bottom: none; }
 .readout td.r { text-align: right; }
 .readout .strong { color: var(--amber); }
 .readout .bar { height: .55rem; display: block; }
 .readout .say {
   margin: 0; text-align: center; color: var(--amber-hi);
-  text-shadow: 0 0 12px rgba(233, 169, 60, .3);
+  text-shadow: 0 0 12px rgba(233, 169, 60, .28);
 }
+
+/* ------------------------------------------------- terms and the tip */
+
+.term {
+  font: inherit; color: var(--amber); cursor: help;
+  border-bottom: 1px dotted rgba(233, 169, 60, .65);
+  padding: 0 .04em;
+}
+.term:hover, .term:focus-visible { color: var(--amber-hi);
+                                   border-bottom-color: var(--amber-hi); }
+
+.tip {
+  position: fixed; z-index: 200; max-width: 22rem;
+  padding: .8rem .95rem;
+  background: #10161A;
+  box-shadow: 0 0 0 1px #333E42, 0 10px 26px rgba(0, 0, 0, .6),
+              inset 0 2px 0 rgba(233, 169, 60, .5);
+  color: var(--enamel-2); font-size: .9rem; line-height: 1.55;
+  pointer-events: none;
+}
+.tip b {
+  display: block; font-family: var(--stencil); text-transform: uppercase;
+  letter-spacing: .13em; font-size: .74rem; color: var(--amber);
+  margin-bottom: .35rem;
+}
+.tip i {
+  display: block; margin-top: .5rem; font-size: .74rem; color: var(--faint);
+  font-style: normal; font-family: var(--stencil); letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+/* ------------------------------------------------------------ index */
+
+.index-screen { align-items: center; }
+.index-head {
+  display: flex; align-items: baseline; gap: 1.2rem;
+  width: min(44rem, 92vw); padding-bottom: .8rem; margin-bottom: 1.2rem;
+  border-bottom: 2px solid #333E42;
+}
+.index-head h2 {
+  font-family: var(--stencil); text-transform: uppercase; letter-spacing: .22em;
+  font-size: 1.1rem; color: var(--enamel);
+}
+.index-intro {
+  width: min(44rem, 92vw); margin: 0 0 2rem; color: var(--enamel-2);
+  font-size: 1rem;
+}
+.index-list { width: min(44rem, 92vw); margin: 0; }
+.index-list dt {
+  font-family: var(--stencil); text-transform: uppercase; letter-spacing: .14em;
+  font-size: .92rem; color: var(--amber); margin-top: 1.6rem;
+  padding: .2rem .4rem; margin-left: -.4rem; transition: background .3s ease;
+}
+.index-list dt.lit { background: rgba(233, 169, 60, .16); }
+.index-list dd { margin: .4rem 0 0; color: var(--enamel-2); }
 
 /* ---------------------------------------------------------- curtain */
 
@@ -321,16 +327,16 @@ button:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
   width: 22rem; height: 12rem; z-index: -1; overflow: visible;
 }
 .eyebrow {
-  margin: 0 0 .7rem;
-  font-family: "Saira Condensed", sans-serif; text-transform: uppercase;
+  margin: 0 0 .7rem; font-family: var(--stencil); text-transform: uppercase;
   letter-spacing: .3em; font-size: .74rem; color: var(--amber);
 }
 .card h2 {
-  font-family: "Saira Condensed", sans-serif; font-weight: 700;
-  text-transform: uppercase; letter-spacing: .06em;
-  font-size: clamp(1.9rem, 5vw, 2.9rem); line-height: 1; color: var(--enamel);
+  font-family: var(--stencil); font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; font-size: clamp(1.9rem, 5vw, 2.9rem); line-height: 1;
+  color: var(--enamel);
 }
-.lesson { margin: 1.4rem 0 0; color: var(--enamel-2); font-size: 1.02rem; }
+.lesson { margin: 1.4rem 0 0; color: var(--enamel-2); font-size: 1.02rem;
+          text-align: left; }
 .card-actions {
   margin-top: 2.2rem; display: flex; gap: 1.8rem;
   align-items: center; justify-content: center;

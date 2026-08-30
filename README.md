@@ -73,11 +73,15 @@ reach. The model underneath is the same CTM the tests exercise.
 ```
 
 The machine is drawn as institutional valve-computing hardware: each processor
-is a thermionic tube whose filament burns at its volume, and the single conscious
-chunk is what gets lit in the amber phosphor aperture above the rack. A link is a
-patch lead that runs under the rack, bypassing the aperture entirely. Shapes are
-displaced through turbulence so their edges scumble like paint rather than
-resolving as vector art.
+is a thermionic tube whose filament burns at the weight it is submitting, and
+the winning chunk is lit in the phosphor window above the rack. Every surface,
+including the keys and switches, is painted in SVG rather than styled -- broken
+colour laid in strokes, light caught on an edge, shapes displaced through
+turbulence so no edge is quite straight.
+
+The drawing is a skin. The writing uses the paper's own vocabulary -- processor,
+chunk, weight, competition, Up-Tree, broadcast, link -- and any term you do not
+know is highlighted: hover it for a definition, click it for the index.
 
 Level 4 is the one to play if you only play one: you
 have an eye that works, an obstacle in front of you, and two switches. Quieting
