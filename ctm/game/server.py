@@ -10,6 +10,7 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+from .routes import dispatch
 from .session import Game
 
 STATIC = Path(__file__).parent / "static"
@@ -47,7 +48,7 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0]
         if path == "/api/state":
             with _lock:
-                return self._json(Handler.game.view())
+                return self._json(dispatch(Handler.game, path, {}))
         name = "index.html" if path == "/" else path.lstrip("/")
         target = (STATIC / name).resolve()
         if not str(target).startswith(str(STATIC.resolve())) or not target.is_file():
@@ -61,19 +62,11 @@ class Handler(BaseHTTPRequestHandler):
         g = Handler.game
         try:
             with _lock:
-                if path == "/api/tick":
-                    return self._json(g.tick(int(body.get("n", 1))))
-                if path == "/api/act":
-                    return self._json(g.act(body["control"], body.get("value")))
-                if path == "/api/level":
-                    return self._json(g.load(int(body["index"])))
-                if path == "/api/retry":
-                    return self._json(g.retry())
-                if path == "/api/next":
-                    return self._json(g.next())
-        except (KeyError, ValueError, TypeError) as exc:
+                return self._json(dispatch(g, path, body))
+        except KeyError as exc:
+            return self._json({"error": str(exc)}, 404)
+        except (ValueError, TypeError) as exc:
             return self._json({"error": f"{type(exc).__name__}: {exc}"}, 400)
-        self._json({"error": "no such endpoint"}, 404)
 
 
 def serve(port: int = 8766, open_browser: bool = True, verbose: bool = False) -> None:

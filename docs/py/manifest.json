@@ -1,0 +1,17 @@
+{
+  "files": [
+    "ctm/__init__.py",
+    "ctm/chunk.py",
+    "ctm/uptree.py",
+    "ctm/processor.py",
+    "ctm/sleeping_experts.py",
+    "ctm/links.py",
+    "ctm/machine.py",
+    "ctm/world.py",
+    "ctm/processors.py",
+    "ctm/game/__init__.py",
+    "ctm/game/levels.py",
+    "ctm/game/session.py",
+    "ctm/game/routes.py"
+  ]
+}

@@ -12,6 +12,8 @@ parameter.
 
 [paper]: https://www.pnas.org/doi/10.1073/pnas.2115934119
 
+**Play it in a browser:** https://vhorvath2010.github.io/blums-ctm/ — no install.
+
 ```
 python -m ctm.game        # the game, six levels        <-- start here
 python -m ctm.viz         # the full console, every knob at once
@@ -94,6 +96,18 @@ never saw.
 Levels are won, not watched: level 4 will not accept an early result, because a
 chunk needs h + 1 ticks to reach the stage and evidence collected before then
 proves nothing.
+
+### The hosted build
+
+`docs/` is a static site for GitHub Pages, built by `python tools/build_pages.py`.
+It is not a JavaScript rewrite. The page loads Pyodide and runs the same `ctm`
+package the tests exercise, so there is no second implementation to drift. The
+site itself is ~120 KB; the Python runtime comes from a CDN on first load and is
+cached afterwards.
+
+The build refuses to run if the file list it copies is incomplete: it imports
+the package in a sandbox containing only those files, and plays every level,
+before writing anything.
 
 ## Watching it think
 
