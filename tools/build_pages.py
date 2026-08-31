@@ -83,6 +83,17 @@ def main() -> int:
     # Declare the backend rather than letting the page probe for a server it
     # will not find; a probe costs a 404 in the console on every load.
     html = (STATIC / "index.html").read_text(encoding="utf-8")
+
+    # A Pages project site lives at /<repo>/, so a root-absolute asset path
+    # resolves against the domain instead and 404s. Serving docs/ at a local
+    # root hides this, so check the source rather than trusting a smoke test.
+    import re
+    rooted = re.findall(r'(?:src|href)="(/[^/][^"]*)"', html)
+    if rooted:
+        print("index.html uses root-absolute asset paths, which break on a")
+        print("project Pages site. Make these relative: " + ", ".join(rooted))
+        return 1
+
     marker = '<meta name="ctm-backend" content="browser">'
     assert marker not in html
     html = html.replace("<title>", marker + "\n<title>", 1)
