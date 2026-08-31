@@ -60,8 +60,10 @@ const GLOSSARY = {
     "How much the submitting processor thinks its own chunk matters. Weight " +
     "sets its odds in the competition and does nothing else.",
   "chunk":
-    "The small packet a processor submits: who sent it, what it says, and how " +
-    "much weight is behind it.",
+    "The unit everything in this machine travels as. Each processor packs one " +
+    "per tick, holding which processor sent it, what it has to say, and how " +
+    "much weight is behind it. Nothing passes between processors in any other " +
+    "form, so a chunk is the only thing that can ever become conscious.",
   "link":
     "A direct channel between two processors. Chunks sent along a link skip " +
     "the competition, so they are never broadcast and the machine never " +
@@ -81,7 +83,11 @@ function withTerms(str) {
   let out = escapeHtml(str);
   const taken = [];
   TERMS.forEach((term) => {
-    const re = new RegExp(`\\b(${term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})\\b`, "i");
+    // Allow a trailing plural. Without it "chunks" never matches, and because
+    // only the first mention in a passage gets wrapped, a passage that reaches
+    // the plural first loses the term altogether.
+    const stem = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp(`\\b(${stem}s?)\\b`, "i");
     const m = out.match(re);
     if (!m) return;
     // Skip a match that landed inside markup already emitted.
